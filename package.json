@@ -5,14 +5,33 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "test": "jest",
+    "test:coverage": "jest --collect-coverage"
   },
   "dependencies": {
+    "@material-ui/core": "^4.11.4",
+    "@material-ui/icons": "^4.11.2",
+    "@types/moment": "^2.13.0",
+    "@types/react-big-calendar": "^0.31.0",
+    "@types/react-table": "^7.7.1",
+    "@types/uuid": "^8.3.0",
+    "date-fns": "^2.21.3",
+    "formik": "^2.2.8",
+    "immer": "^9.0.2",
+    "jest": "26.6.3",
+    "moment": "^2.29.1",
+    "moment-range": "^4.0.2",
     "next": "latest",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react-big-calendar": "^0.33.3",
+    "react-dom": "^17.0.1",
+    "react-table": "^7.7.0",
+    "ts-jest": "^26.5.6",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.23",
     "@types/node": "^12.12.21",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
