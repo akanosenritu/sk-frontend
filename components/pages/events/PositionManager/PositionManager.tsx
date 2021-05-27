@@ -23,18 +23,6 @@ const PositionManager: React.FC<{
       defaultPositionData: getPositionDataOrDefaultData(newData, props.positionGroup.defaultPositionData)
     })
   }
-  const [title, setTitle] = useState(props.positionGroup.title)
-  const handleChangeTitle = (event: ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
-    setTitle(event.target.value)
-  }
-  const onBlurTitleInput = () => {
-    if (title === "") {
-      setTitle(props.positionGroup.title)
-    } else {
-      props.onSave({...props.positionGroup, title})
-    }
-  }
-
   const onClickDelete = () => {
     props.onDelete(props.positionGroup)
   }
@@ -59,12 +47,11 @@ const PositionManager: React.FC<{
   return <Box mt={2} ml={1} style={{border: "1px solid lightgray", borderRadius: 20}}>
     <Box style={{borderBottom: "1px solid darkgray", borderTopRightRadius: 20, borderTopLeftRadius: 20, backgroundColor: "lightgray", padding: 10}}>
       <Box display={"flex"} justifyContent={"space-between"}>
-        <Typography variant={"h6"}>
+        <Typography variant={"h6"} style={{flexGrow: 1}}>
           <InputBase
-            onBlur={onBlurTitleInput}
-            onChange={handleChangeTitle}
+            disabled={true}
             style={{fontSize: 20}}
-            value={title}
+            value={props.positionGroup.title}
           />
         </Typography>
         <Box>

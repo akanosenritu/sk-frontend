@@ -1,4 +1,4 @@
-import {compareAsc, differenceInCalendarDays, endOfDay} from "date-fns"
+import {compareAsc, differenceInCalendarDays, endOfDay, format} from "date-fns"
 
 const rawTimeStringRegexPattern1 = /^([0-9]?[0-9]):?([0-9]{2})$/
 
@@ -110,4 +110,8 @@ export const getIntervals = (dates: Date[]): {start: Date, end: Date}[] => {
     intervals.push({start: currentStart, end: currentStart})
   }
   return intervals.map(interval => ({...interval, end: endOfDay(interval.end)}))
+}
+
+export const formatDateToYYYYMMDD = (date: Date): string => {
+  return format(date, "yyyy-MM-dd")
 }

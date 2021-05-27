@@ -1,21 +1,26 @@
 import {v4} from "uuid"
 import {eachDayOfInterval} from "date-fns"
-import {ClothesSetting, defaultClothesSettings} from "./clothes"
-import {defaultGatheringPlaceSettings, GatheringPlaceSetting} from "./gatheringPlace"
+import {ClothesSetting} from "./clothes"
+import {GatheringPlaceSetting} from "./gatheringPlace"
 import {PositionGroup, PositionData, PositionDataNullable, Position, ValueWithDefault} from "../types/positions"
 import {getIntervals} from "./time"
 import {isCreatedData, isNotCreatedData} from "./object"
 
-export const DefaultPositionData: PositionData = {
-  isSaved: false,
-  uuid: v4(),
-  startHour: {hour: 8, minute: 0},
-  endHour: {hour: 17, minute: 0},
-  male: 0,
-  female: 0,
-  unspecified: 5,
-  clothes: defaultClothesSettings[0],
-  gatheringPlace: defaultGatheringPlaceSettings[0]
+export const createDefaultPositionData = (
+  clothesSetting: ClothesSetting,
+  gatheringPlaceSetting: GatheringPlaceSetting
+): PositionData => {
+  return {
+    isSaved: false,
+    uuid: v4(),
+    startHour: {hour: 8, minute: 0},
+    endHour: {hour: 17, minute: 0},
+    male: 0,
+    female: 0,
+    unspecified: 5,
+    clothes: clothesSetting,
+    gatheringPlace: gatheringPlaceSetting
+  }
 }
 
 type CreateDefaultPosition = {
@@ -32,7 +37,7 @@ type CreateDefaultPosition = {
 
 const createDefaultPosition = (params: CreateDefaultPosition): Position => {
   return {
-    uuid: "",
+    uuid: v4(),
     date: params.date,
     isSaved: false,
     data: {
@@ -72,17 +77,19 @@ export const createPositionGroup = (params: CreatePositionGroupParams): Position
       parentPosition: positionGroup
     })
   })
+  console.log(positionGroup)
   return positionGroup
 }
 
-export const convertPositionGroupToCalendarEvents = (positionGroup: PositionGroup): CalendarEvent[] => {
+export const convertPositionGroupToCalendarEvents = (positionGroup: PositionGroup): CalendarEvent<PositionGroup>[] => {
   const intervals = getIntervals(positionGroup.positions.map(pos => pos.date))
   return intervals.map(interval => ({
     title: positionGroup.title,
     start: interval.start,
     end: interval.end,
     allDay: true,
-    backgroundColor: positionGroup.positionColor
+    backgroundColor: positionGroup.positionColor,
+    data: positionGroup,
   }))
 }
 

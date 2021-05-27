@@ -4,6 +4,7 @@ import {Box, Button, Card, CardContent, IconButton, InputBase, Typography} from 
 import SaveIcon from "@material-ui/icons/Save"
 import EditIcon from "@material-ui/icons/Edit"
 import {cloneSetting, createBlankSetting, Setting} from "../../../utils/setting"
+import {Failure, Success} from "../../../utils/api/api"
 
 const SettingCard: React.FC<{
   setting: Setting,
@@ -55,10 +56,8 @@ const SettingCard: React.FC<{
 
 const SettingsManagerBase: React.FC<{
   settings: Setting[],
-  onSave: (newSettings: Setting[]) => void,
+  onCreate: (newSetting: Setting) => Promise<Success|Failure>
 }> = props => {
-  const [settings, setSettings] = useState<Setting[]>(props.settings)
-
   const onClickEditSetting = (setting: Setting) => {
     // it should ask the server if the setting can be modified or not.
     // if not, it should create a clone setting and edit it instead.
@@ -72,14 +71,17 @@ const SettingsManagerBase: React.FC<{
     const setting = createBlankSetting()
     setSettingsEditing(settings => [...settings, setting])
   }
-  const onSaveEditedSetting = (editedSetting: Setting) => {
-    setSettingsEditing(settings => settings.filter(setting => setting.uuid !== editedSetting.uuid))
-    props.onSave([...settings, editedSetting])
-    setSettings([...settings, editedSetting])
+  const onSaveEditedSetting = async (editedSetting: Setting) => {
+    const creationResult = await props.onCreate(editedSetting)
+    if (creationResult.ok) {
+      setSettingsEditing(settings => settings.filter(setting => setting.uuid !== editedSetting.uuid))
+    } else {
+
+    }
   }
 
   return <Box mt={3} ml={3} display={"flex"} flexDirection={"column"}>
-    {settings.map(setting => (
+    {props.settings.map(setting => (
       <SettingCard setting={setting} onEdit={onClickEditSetting} onSave={onSaveEditedSetting} editing={false} key={setting.uuid}/>
     ))}
     {settingsEditing.map(setting => (

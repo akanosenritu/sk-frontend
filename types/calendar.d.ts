@@ -1,7 +1,8 @@
-type CalendarEvent = {
+type CalendarEvent<T> = {
   title: string,
   start: Date,
   end: Date,
   allDay: boolean,
-  backgroundColor: string
+  backgroundColor: string,
+  data: T,
 }

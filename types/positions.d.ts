@@ -36,3 +36,10 @@ declare type PositionGroup = {
   positions: Position[],
   positionColor: string,
 } & ObjectInfo
+
+declare type Event = {
+  title: string,
+  datetimeAdded: Date,
+  datetimeLastModified: Date,
+  positionGroups: PositionGroup[]
+} & ObjectInfo
