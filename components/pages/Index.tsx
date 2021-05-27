@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import MyCalendar from "../MyCalendar"
 
 const Index: React.FC = () => {
-  const [events] = useState<CalendarEvent[]>([])
+  const [events] = useState<CalendarEvent<any>[]>([])
 
   return (
     <div>

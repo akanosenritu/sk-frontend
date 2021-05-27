@@ -44,8 +44,7 @@ export const useClothesSettings = () => {
     return result
   }
 
-  const updateSettings = (updatedSetting: ClothesSetting) => {
-  }
+  // const updateSettings = (updatedSetting: ClothesSetting) => {}
 
   return {settings, createSetting}
 }

@@ -34,11 +34,11 @@ type Props = {
   myEvent: MyEvent|null
 }
 
-type EventEditorStatus = "Editing" | "Saving" | "Saved" | "SaveFailed"
+// type EventEditorStatus = "Editing" | "Saving" | "Saved" | "SaveFailed"
 
 const EventEditor: React.FC<Props> = () => {
   const classes = useStyles()
-  const [status, setStatus] = useState<EventEditorStatus>("Editing")
+  // const [status, setStatus] = useState<EventEditorStatus>("Editing")
   const [event, setEvent] = useState<Event>(createDefaultEvent())
 
   const EventComponent = (e: any) => {

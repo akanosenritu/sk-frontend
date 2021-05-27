@@ -27,7 +27,7 @@ const messages = {
 type View = "month" | "week" | "day" | "agenda"
 
 type Props = {
-  events: CalendarEvent[],
+  events: CalendarEvent<any>[],
   onSelectSlot: (start: Date, end: Date, action: "select"|"click"|"doubleClick") => void,
   views?: View[],
   components?: {event: any}
@@ -72,7 +72,7 @@ const MyCalendar: React.FC<Props> = (props) => {
       onSelectSlot={onSelectSlot}
       components={props.components}
       popup={true}
-      eventPropGetter={(event: CalendarEvent) => {
+      eventPropGetter={(event: CalendarEvent<any>) => {
         return {
           style: {backgroundColor: event.backgroundColor}
         }

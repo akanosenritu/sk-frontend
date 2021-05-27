@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useState} from "react"
+import React, {useState} from "react"
 import PositionTable from "../PositionTable/PositionTable"
 import {Box, IconButton, InputBase, Typography} from "@material-ui/core"
 import {Setting} from "../../../../utils/setting"
