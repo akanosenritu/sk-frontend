@@ -45,7 +45,6 @@ export const sampleStaffDataArray = [
   {"number":21,"president":"Chester A. Arthur","birth_year":1829,"death_year":1886,"took_office":"1881-09-19","left_office":"1885-03-04","party":"Republican"},
   {"number":22,"president":"Grover Cleveland","birth_year":1837,"death_year":1908,"took_office":"1885-03-04","left_office":"1889-03-04","party":"Democratic"},
   {"number":23,"president":"Benjamin Harrison","birth_year":1833,"death_year":1901,"took_office":"1889-03-04","left_office":"1893-03-04","party":"Republican"},
-  {"number":24,"president":"Grover Cleveland","birth_year":1837,"death_year":1908,"took_office":"1893-03-04","left_office":"1897-03-04","party":"Democratic"},
   {"number":25,"president":"William McKinley","birth_year":1843,"death_year":1901,"took_office":"1897-03-04","left_office":"1901-09-14","party":"Republican"},
   {"number":26,"president":"Theodore Roosevelt","birth_year":1858,"death_year":1919,"took_office":"1901-09-14","left_office":"1909-03-04","party":"Republican"},
   {"number":27,"president":"William Howard Taft","birth_year":1857,"death_year":1930,"took_office":"1909-03-04","left_office":"1913-03-04","party":"Republican"},

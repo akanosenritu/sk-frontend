@@ -16,7 +16,7 @@ const Assign: React.FC = () => {
   return <div style={{width: "80%", margin: "auto"}}>
     {event && <AssignTable
       availableStaffUUIDsByDay={{
-        "2021-05-03": sampleStaffData.slice(0, 10).map(staff => staff.uuid),
+        "2021-05-03": sampleStaffData.slice(0, 20).map(staff => staff.uuid),
         "2021-05-04": sampleStaffData.slice(11, 20).map(staff => staff.uuid),
         "2021-05-05": sampleStaffData.slice(21, 30).map(staff => staff.uuid),
         "2021-05-06": sampleStaffData.slice(31, 40).map(staff => staff.uuid),

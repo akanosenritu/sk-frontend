@@ -45,33 +45,37 @@ const PositionCell: React.FC<{
   const classes = useStyles()
   return <td
     className={classes.root}
-    style={{backgroundColor: isOk? "": "#fefbd8"}}
+    style={{backgroundColor: isOk? "": "#fefbd8", height: 1}}
   >
-    <Droppable droppableId={props.id}>
-      {provided => (
+    <div style={{display:"flex", justifyContent: "flex-end", flexDirection: "column", height: "100%"}}>
+      <Droppable droppableId={props.id}>
+        {provided => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
+            style={{flexGrow: 1}}
           >
             {staffs.map((staff, index) => {
               return <StaffItem
                 dayString={formatDateToYYYYMMDD(props.position.date)}
-                id={`${props.id}-${staff.name}`}
+                key={`staffItem===${staff.uuid}===${formatDateToYYYYMMDD(position.date)}`}
+                id={`staffItem===${staff.uuid}===${formatDateToYYYYMMDD(position.date)}`}
                 index={index}
                 staff={staff}
               />
             })}
             {provided.placeholder}
           </div>
-      )}
-    </Droppable>
-    <div className={classes.footer}>
-      {isOk?
-        <CheckOutlinedIcon/>:
-        <Tooltip title={errorMessage}>
-          <ErrorOutlineOutlinedIcon />
-        </Tooltip>
-      }
+        )}
+      </Droppable>
+      <div className={classes.footer}>
+        {isOk?
+          <CheckOutlinedIcon/>:
+          <Tooltip title={errorMessage}>
+            <ErrorOutlineOutlinedIcon />
+          </Tooltip>
+        }
+      </div>
     </div>
   </td>
 }

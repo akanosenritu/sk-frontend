@@ -20,8 +20,8 @@ const AssignableStaffCell: React.FC<{
           {staffs.map((staff, index) => {
             return <StaffItem
               dayString={props.dayString}
-              key={`${props.id}-${staff.name}`}
-              id={`${props.id}-${staff.name}`}
+              key={`staffItem===${staff.uuid}===${props.dayString}`}
+              id={`staffItem===${staff.uuid}===${props.dayString}`}
               index={index}
               staff={staff}
             />

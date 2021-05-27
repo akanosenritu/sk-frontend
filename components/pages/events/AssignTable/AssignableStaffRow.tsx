@@ -7,10 +7,10 @@ const AssignableStaffRow: React.FC<{
   columnDays: string[],
 }> = (props) => {
   return <tr>
-    <td>残りのスタッフ</td>
+    <td>配置可能な<br/>スタッフ</td>
     {props.columnDays.map(day => {
       return <AssignableStaffCell
-        id={`staffCell-${day}`}
+        id={`staffCell===${day}`}
         availableStaffUUIDs={props.availableStaffsByDay[day]}
         dayString={day}
       />
