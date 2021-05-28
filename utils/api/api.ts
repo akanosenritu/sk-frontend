@@ -1,6 +1,6 @@
 import Cookies from "js-cookie"
 
-export const apiURL = "http://localhost:8000/api/"
+export const apiURL = "/api/"
 
 export type Success = {
   ok: true
