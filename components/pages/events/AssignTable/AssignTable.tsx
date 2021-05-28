@@ -69,6 +69,25 @@ const AssignTable: React.FC<{
     setStaffPositionAssignments(old => produce(old, draft => {
       if (new Set(availableStaffsByDay[dayString]).has(staffUUID)) {
         draft[positionGroupUUID].assignedStaffUUIDsByDay[dayString].splice(index, 0, staffUUID)
+      } else {
+        // if other positionGroup have this staff, release him from it and reassign him to this.
+        const otherPositionGroupWithThisStaffUUID = props.event.positionGroups
+          .map(positionGroup => positionGroup.uuid)
+          .find(positionGroupUUID => {
+            const staffUUIDs: string[] | undefined = staffPositionAssignments[positionGroupUUID].assignedStaffUUIDsByDay[dayString]
+            if (staffUUIDs) {
+              return new Set(staffUUIDs).has(staffUUID)
+            }
+            return false
+          })
+        if (otherPositionGroupWithThisStaffUUID) {
+          const oldIndex = draft[otherPositionGroupWithThisStaffUUID].assignedStaffUUIDsByDay[dayString]
+            .findIndex(_staffUUID => _staffUUID === staffUUID) 
+          if (oldIndex !== -1) {
+            draft[otherPositionGroupWithThisStaffUUID].assignedStaffUUIDsByDay[dayString].splice(oldIndex, 1)
+            draft[positionGroupUUID].assignedStaffUUIDsByDay[dayString].splice(index, 0, staffUUID)
+          }
+        }
       }
     }))
   }
