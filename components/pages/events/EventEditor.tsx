@@ -1,6 +1,5 @@
 import {Box, Button, makeStyles, TextField, Typography} from "@material-ui/core"
 import React, {ChangeEvent, useState} from "react"
-import {useFormik} from "formik"
 import MyCalendar from "../../MyCalendar"
 import {H5} from "../../Header"
 import {
@@ -14,7 +13,7 @@ import {useClothesSettings, useGatheringPlaceSettings} from "../../../utils/sett
 import {PositionGroup} from "../../../types/positions"
 import {Event} from "../../../types/positions"
 import produce from "immer"
-import {createDefaultEvent} from "../../../utils/event"
+import {validateEvent} from "../../../utils/event"
 import PositionManager from "./PositionManager/PositionManager"
 import {createEventOnBackend} from "../../../utils/api/event"
 
@@ -31,15 +30,15 @@ const useStyles = makeStyles({
 })
 
 type Props = {
-  myEvent: MyEvent|null
+  event: Event
 }
 
 // type EventEditorStatus = "Editing" | "Saving" | "Saved" | "SaveFailed"
 
-const EventEditor: React.FC<Props> = () => {
+const EventEditor: React.FC<Props> = (props) => {
   const classes = useStyles()
   // const [status, setStatus] = useState<EventEditorStatus>("Editing")
-  const [event, setEvent] = useState<Event>(createDefaultEvent())
+  const [event, setEvent] = useState<Event>(props.event)
 
   const EventComponent = (e: any) => {
     const event: CalendarEvent<PositionGroup> = e.event
@@ -102,18 +101,11 @@ const EventEditor: React.FC<Props> = () => {
     addPositionGroup(newPosition)
   }
 
-  const [title, setTitle] = useState("デフォルトのタイトル")
-  const handleTitleChange = (event: ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
-    setTitle(event.target.value)
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
+    setEvent(produce(event, draft => {
+      draft.title = e.target.value
+    }))
   }
-
-  const formik = useFormik({
-    initialValues: {
-      title: "",
-      assignedTo: ""
-    },
-    onSubmit: () => {}
-  })
 
   const {settings: clothesSettings, createSetting: createClothesSetting} = useClothesSettings()
   const {settings: gatheringPlaceSettings, createSetting: createGatheringPlaceSetting} = useGatheringPlaceSettings()
@@ -122,9 +114,14 @@ const EventEditor: React.FC<Props> = () => {
     return event.positionGroups.map(pos => convertPositionGroupToCalendarEvents(pos)).flat()
   }
 
-  const onSaveEvent = () => {
-    createEventOnBackend(event)
+  const onSaveEvent = async () => {
+    const result = await createEventOnBackend(event)
+    if (result.ok) {
+      setEvent(event)
+    }
   }
+
+  const {ok: isValid, errors: validateErrors} = validateEvent(event)
 
   return <Box style={{minWidth: 600}}>
     <Box mt={5}>
@@ -136,27 +133,24 @@ const EventEditor: React.FC<Props> = () => {
         InputLabelProps={{shrink: true}}
         style={{marginTop: 20}}
         name={"title"}
-        value={title}
+        value={event.title}
         onChange={handleTitleChange}
         autoComplete={"off"}
       />
-      <TextField
-        variant={"outlined"}
-        label={"担当者*"}
-        fullWidth={true}
-        InputLabelProps={{shrink: true}}
-        style={{marginTop: 20}}
-        name={"assignedTo"}
-        value={formik.values.assignedTo}
-        onChange={formik.handleChange}
-        autoComplete={"off"}
-      />
+      <Box mt={1} ml={1}>
+        <Typography variant={"body2"}>イベント名は簡潔かつわかりやすいものにしてください。</Typography>
+      </Box>
     </Box>
     <Box mt={5} mb={5}>
       <H5>2. 配置の日程を設定する</H5>
-      <Typography variant={"body1"}>
-        空のセルをクリック、またはドラッグすることで配置を追加できます。[消] ボタンを押すと、アイテムを消すことができます。
-      </Typography>
+      <Box m={1}>
+        <Typography variant={"body2"}>
+          空のセルをクリック、またはドラッグすることで配置を追加できます。[消] ボタンを押すと、アイテムを消すことができます。配置名をクリックすると、配置名を編集できます。
+          同じ名前の配置が複数あるとわかりにくいので、避けたほうがよいでしょう。
+
+          ここで設定する配置は必ずしも現実の配置と一致する必要はありません。同じ服装・集合場所・集合場所を共有するひとまとまりのグループと考えてください。あまり細分化すると設定するのが大変です。
+        </Typography>
+      </Box>
       <MyCalendar
         events={getCalendarEvents()}
         onSelectSlot={calendarOnSelectSlot}
@@ -167,22 +161,27 @@ const EventEditor: React.FC<Props> = () => {
     <div />
     <Box mt={3}>
       <H5>3. 服装の設定を作成する</H5>
-      <Typography variant={"body1"}>
+      <Typography variant={"body2"}>
         配置の設定で使用する服装設定を作成します。既存の設定を使う場合はそのままで構いません。
+        既存の設定は他のイベントと結びついている場合があるため、ここでは編集できません。既存の設定の編集ボタンを押すとコピーした内容の別の設定が作成できます。
+        編集が終わったら保存ボタンを押してください。メール文面作成の際には、説明の部分が使われます。
       </Typography>
       <SettingsManagerBase settings={clothesSettings} onCreate={createClothesSetting}/>
     </Box>
     <Box mt={3}>
       <H5>4. 集合場所の設定を作成する</H5>
-      <Typography variant={"body1"}>
+      <Typography variant={"body2"}>
         配置の設定で使用する集合場所設定を作成します。既存の設定を使う場合はそのままで構いません。
+        既存の設定は他のイベントと結びついている場合があるため、ここでは編集できません。既存の設定の編集ボタンを押すとコピーした内容の別の設定が作成できます。
+        編集が終わったら保存ボタンを押してください。メール文面作成の際には、説明の部分が使われます。
       </Typography>
       <SettingsManagerBase settings={gatheringPlaceSettings} onCreate={createGatheringPlaceSetting}/>
     </Box>
     <Box mt={5}>
       <H5>5. 配置ごとの時間、服装などを設定する</H5>
-      <Typography variant={"body1"}>
-        配置ごとに日毎の集合時間、集合場所、服装を設定してください。
+      <Typography variant={"body2"}>
+        配置ごとに日毎の集合時間、集合場所、服装を設定してください。配置ごとにデフォルトの値が設定されており、その値を編集するとデフォルト値を使用している日すべてに影響します。
+        日毎の値を個別に設定したい場合は、設定したい部分をクリックし、日毎の編集画面を開いてください。
       </Typography>
       {event.positionGroups.map(positionGroup => (
         <PositionManager
@@ -193,13 +192,23 @@ const EventEditor: React.FC<Props> = () => {
           onSave={modifyPositionGroup}
         />
       ))}
+      {event.positionGroups.length === 0 && <Box m={3} style={{color: "red"}}>配置がありません。</Box>}
     </Box>
     <Box mt={3}>
       <H5>6. 保存する</H5>
-      <Typography variant={"body1"}>保存ボタンを押すことでデータが保存され、スタッフの割当ができるようになります。</Typography>
+      <Typography variant={"body2"}>保存ボタンを押すことでデータが保存され、スタッフの割当ができるようになります。</Typography>
+      {!isValid && <Box mt={1} style={{color: "red"}}>
+        設定に問題があるため保存できません。
+        <ul>
+          {Object.entries(validateErrors).map(entry => {
+            return <li>{entry[0]}: {entry[1]}</li>
+          })}
+        </ul>
+      </Box>}
       <Box mt={1}>
         <Button
           color={"primary"}
+          disabled={!isValid}
           fullWidth={true}
           onClick={onSaveEvent}
           variant={"contained"}

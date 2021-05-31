@@ -2,7 +2,7 @@ import React from "react"
 import {makeStyles} from "@material-ui/core"
 import {getGenderColor} from "../../../../utils/gender"
 import {Draggable} from "react-beautiful-dnd"
-import {RegisteredStaffDraft} from "../../../../types/staffs"
+import {RegisteredStaff} from "../../../../types/staffs"
 
 const useStyles = makeStyles({
   root: {
@@ -26,7 +26,7 @@ const useStyles = makeStyles({
 const StaffItem: React.FC<{
   id: string,
   index: number,
-  staff: RegisteredStaffDraft,
+  staff: RegisteredStaff,
   dayString: string
 }> = (props) => {
   const classes = useStyles()
@@ -41,7 +41,7 @@ const StaffItem: React.FC<{
       >
         <div className={classes.hour} />
         <div className={classes.name} style={{backgroundColor: getGenderColor(staff.gender)}}>
-          {staff.name}
+          {`${staff.lastName}, ${staff.firstName}`}
         </div>
         <div className={classes.hour} />
       </div>

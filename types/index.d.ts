@@ -1,5 +1,3 @@
-declare type Gender = "male" | "female" | "unspecified"
-
 declare type RawTime = {
   hour: number,
   minute: number,

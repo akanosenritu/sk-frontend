@@ -1,5 +1,6 @@
 import React from "react"
-import {Position, PositionGroup} from "../../../../types/positions"
+import {Position} from "../../../../types/position"
+import {PositionGroup} from "../../../../types/positions"
 import {formatDateToYYYYMMDD} from "../../../../utils/time"
 import PositionCell from "./PositionCell"
 import EmptyCell from "./EmptyCell"

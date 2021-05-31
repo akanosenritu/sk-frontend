@@ -1,13 +1,21 @@
 import {Position, PositionGroup} from "./positions"
 
-declare type RegisteredStaffDraft = {
-  uuid: string,
-  name: string,
+declare type RegisteredStaff = {
+  staffId: string,
   gender: Gender,
-}
+  lastName: string,
+  lastNameKana: string,
+  firstName: string,
+  firstNameKana: string,
+  birthDate: Date,
+  registeredDate: Date,
+  isActive: boolean,
+  telephoneNumber: string,
+  emailAddress: string
+} & ObjectInfo
 
 declare type StaffsDict = {
-  [staffUUID: string]: RegisteredStaffDraft
+  [staffUUID: string]: RegisteredStaff
 }
 
 declare type StaffUUIDsByDay =  {

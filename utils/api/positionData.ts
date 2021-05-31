@@ -26,8 +26,12 @@ export const convertAPIPositionDataToPositionDataNullable = (apiPositionData: AP
     endHour:  apiPositionData.end_hour?
       stringToRawTime(apiPositionData.end_hour) || {hour: 23, minute: 59}:
       null,
-    clothes: convertAPIClothesSettingToClothesSetting(apiPositionData.clothes),
-    gatheringPlace: convertAPIGatheringPlaceSettingToGatheringPlaceSetting(apiPositionData.gathering_place),
+    clothes: apiPositionData.clothes?
+      convertAPIClothesSettingToClothesSetting(apiPositionData.clothes):
+      null,
+    gatheringPlace: apiPositionData.gathering_place?
+      convertAPIGatheringPlaceSettingToGatheringPlaceSetting(apiPositionData.gathering_place):
+      null,
     isSaved: true
   }
 }

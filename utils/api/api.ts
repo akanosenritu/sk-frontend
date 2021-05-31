@@ -1,6 +1,7 @@
 import Cookies from "js-cookie"
+import {getJWT} from "../user"
 
-export const apiURL = "http://localhost:8000/api/"
+export const apiURL = "/api/"
 
 export type Success = {
   ok: true
@@ -15,7 +16,7 @@ export type Failure = {
 }
 
 export const setCsrfToken = async (): Promise<string> => {
-  await get("set-csrf-token/")
+  await getWithJWT("set-csrf-token/")
   return Cookies.get("csrftoken") as string
 }
 
@@ -25,9 +26,18 @@ export const getCsrfToken = async (): Promise<string> => {
   return setCsrfToken()
 }
 
-export const get = async <T>(target: string): Promise<SuccessWithData<T>|Failure> => {
+export const getWithJWT = async <T>(target: string): Promise<SuccessWithData<T>|Failure> => {
+  const jwt = getJWT()
+  if (!jwt) return {
+    ok: false,
+    description: "jwt was not found."
+  }
   try {
-    const response = await fetch(apiURL + target)
+    const response = await fetch(apiURL + target, {
+      headers: {
+        "Authorization": "Bearer " + jwt.access,
+      }
+    })
     if (response.ok) {
       return {
         ok: true,
@@ -54,7 +64,45 @@ export const post = async <T>(target: string, data: T): Promise<SuccessWithData<
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken
+        "X-CSRFToken": csrfToken,
+      },
+      body: JSON.stringify(data)
+    })
+    if (response.ok) {
+      const returnedData = await response.json()
+      return {
+        ok: true,
+        data: returnedData as T
+      }
+    }
+    return {
+      ok: false,
+      description: response.statusText,
+      data: await response.json(),
+    }
+  } catch (e) {
+    return {
+      ok: false,
+      description: "unknown error",
+      data: e
+    }
+  }
+}
+
+export const postWithJWT = async <T>(target: string, data: T): Promise<SuccessWithData<T>|Failure> => {
+  const jwt = getJWT()
+  if (!jwt) return {
+    ok: false,
+    description: "jwt was not found."
+  }
+  try {
+    const csrfToken = await getCsrfToken()
+    const response = await fetch(apiURL + target, {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + jwt.access,
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
       },
       body: JSON.stringify(data)
     })
@@ -81,7 +129,7 @@ export const post = async <T>(target: string, data: T): Promise<SuccessWithData<
 
 export const postWritable = async <T, T2>(target: string, data:T): Promise<SuccessWithData<T2>|Failure> => {
   try {
-    const result = await post<T>(target, data)
+    const result = await postWithJWT<T>(target, data)
     if (result.ok) {
       return {
         ...result,

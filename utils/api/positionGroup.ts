@@ -1,5 +1,6 @@
 import {APIPositionGroup, WritableAPIPositionGroup} from "../../types/api"
-import {Position, PositionGroup} from "../../types/positions"
+import {Position} from "../../types/position"
+import {PositionGroup} from "../../types/positions"
 import {
   convertAPIPositionDataNotNullableToPositionData,
   convertPositionDataToAPIPositionData,

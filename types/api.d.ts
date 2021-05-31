@@ -1,5 +1,6 @@
 import {APIClothesSetting} from "../utils/api/clothesSetting"
 import {APIGatheringPlaceSetting} from "../utils/api/gatheringPlaceSetting"
+import {APIRegisteredStaff} from "../utils/api/staff"
 
 declare type APIClothesSetting = {
   uuid: string,
@@ -47,6 +48,7 @@ declare type WritableAPIPositionData = APIPositionData & {
 declare type APIPositionBase = {
   uuid: string,
   date: string,  // in the format of YYYY-MM-DD
+  assigned_staffs: APIRegisteredStaff[],
 }
 
 declare type APIPosition = APIPositionBase & {
@@ -55,6 +57,7 @@ declare type APIPosition = APIPositionBase & {
 
 declare type WritableAPIPosition = APIPositionBase & {
   data_uuid: string,  // refers to the uuid of APIPositionData
+  assigned_staff_uuids: string[],
 }
 
 declare type APIPositionGroupBase = {

@@ -1,4 +1,4 @@
-import {Failure, get, post, SuccessWithData} from "./api"
+import {Failure, getWithJWT, postWithJWT, SuccessWithData} from "./api"
 import {ClothesSetting} from "../clothes"
 import {APIClothesSetting} from "../../types/api"
 
@@ -11,7 +11,7 @@ export const convertClothesSettingsToAPIClothesSettings = (clothesSetting: Cloth
 }
 
 export const getClothesSettingsFromBackend = async (): Promise<SuccessWithData<ClothesSetting[]>|Failure> => {
-  const result = await get<APIClothesSetting[]>(
+  const result = await getWithJWT<APIClothesSetting[]>(
     "clothes-settings/"
   )
   if (result.ok) {
@@ -26,7 +26,8 @@ export const getClothesSettingsFromBackend = async (): Promise<SuccessWithData<C
 export const createClothesSettingOnBackend = async (
   clothesSetting: ClothesSetting
 ): Promise<SuccessWithData<ClothesSetting>|Failure> => {
-  const result = await post<APIClothesSetting>(
+  console.log("creating a new clothes setting...")
+  const result = await postWithJWT<APIClothesSetting>(
     "clothes-settings/",
     convertClothesSettingsToAPIClothesSettings(clothesSetting)
   )

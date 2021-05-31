@@ -1,5 +1,6 @@
 import {ClothesSetting} from "../utils/clothes"
 import {GatheringPlaceSetting} from "../utils/gatheringPlace"
+import {Position} from "./position"
 
 declare type ValueWithDefault<T> = {
   value: T,
@@ -22,12 +23,6 @@ declare type PositionData = PositionDataBase & ObjectInfo
 declare type PositionDataNullableBase = {[key in keyof PositionDataBase]: PositionDataBase[key] | null }
 // generally corresponds to api.models.PositionData
 declare type PositionDataNullable =  PositionDataNullableBase & ObjectInfo
-
-// corresponds to api.models.Position
-declare type Position = {
-  date: Date,
-  data: PositionDataNullable
-} & ObjectInfo
 
 // corresponds to api.models.PositionGroup
 declare type PositionGroup = {

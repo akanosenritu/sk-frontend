@@ -1,6 +1,7 @@
 import {format, isAfter, isBefore} from "date-fns"
 import {rawTimeToString} from "./time"
-import {PositionGroup, Position, ValueWithDefault} from "../types/positions"
+import {Position} from "../types/position"
+import {PositionGroup, ValueWithDefault} from "../types/positions"
 import {getValueWithDefault} from "./positions"
 import {Setting} from "./setting"
 

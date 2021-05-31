@@ -1,10 +1,11 @@
 import React from "react"
 import New from "../../components/pages/events/New"
+import Layout from "../../components/Layout"
 
-const Index = () => {
-  return <div>
+const Page = () => {
+  return <Layout title={"新しいイベントを作成する"}>
     <New />
-  </div>
+  </Layout>
 }
 
-export default Index
+export default Page

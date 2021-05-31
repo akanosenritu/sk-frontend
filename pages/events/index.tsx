@@ -1,10 +1,10 @@
 import React from "react"
-import New from "../../components/pages/events/New"
+import Index from "../../components/pages/events/Index"
 
-const Index = () => {
+const Page = () => {
   return <div>
-    <New />
+    <Index />
   </div>
 }
 
-export default Index
+export default Page

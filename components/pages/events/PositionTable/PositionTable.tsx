@@ -3,7 +3,8 @@ import {makeStyles, Typography} from "@material-ui/core"
 import {getGenderColor} from "../../../../utils/gender"
 import {prepareRows} from "../../../../utils/positionTable"
 import Row from "./Row"
-import {PositionGroup, Position} from "../../../../types/positions"
+import {PositionGroup} from "../../../../types/positions"
+import {Position} from "../../../../types/position"
 
 const useStyles = makeStyles({
   table: {

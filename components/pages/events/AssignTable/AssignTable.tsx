@@ -1,6 +1,6 @@
 import React, {useMemo, useState} from "react"
 import {Event} from "../../../../types/positions"
-import {makeStyles} from "@material-ui/core"
+import {Box, Button, makeStyles} from "@material-ui/core"
 import DayHeader from "./DayHeader"
 import PositionGroupRow from "./PositionGroupRow"
 import {formatDateToYYYYMMDD} from "../../../../utils/time"
@@ -9,6 +9,7 @@ import {StaffPositionAssignments, StaffUUIDsByDay} from "../../../../types/staff
 import {DragDropContext, DropResult} from "react-beautiful-dnd"
 import produce from "immer"
 import {useStaffsDict} from "../../../../utils/staff"
+import {updatePositionOnBackend} from "../../../../utils/api/position"
 
 
 const useStyles = makeStyles({
@@ -108,7 +109,7 @@ const AssignTable: React.FC<{
     }))
     console.log(availableStaffUUIDsSetByDay)
     return Object.fromEntries(dayStrings.map(dayString => {
-      return [dayString, [...availableStaffUUIDsSetByDay[dayString]].sort((a, b) => staffsDict[a].name.toLowerCase() < staffsDict[b].name.toLowerCase()? -1: 1)]
+      return [dayString, [...availableStaffUUIDsSetByDay[dayString]].sort((a, b) => staffsDict[a].lastName.toLowerCase() < staffsDict[b].lastName.toLowerCase()? -1: 1)]
     }))
   }, [staffPositionAssignments])
 
@@ -125,6 +126,24 @@ const AssignTable: React.FC<{
       const positionGroupUUID = destinationIDTokens.shift() as string
       const dayString = destinationIDTokens.shift() as string
       assignStaffToPosition(staffUUID, positionGroupUUID, dayString, destination.index)
+    }
+  }
+
+  const onSave = async () => {
+    const staffPositionAssignmentsForPositionGroups = Object.values(staffPositionAssignments)
+    for (const {positionGroup, assignedStaffUUIDsByDay} of staffPositionAssignmentsForPositionGroups) {
+      for (const position of positionGroup.positions) {
+        const dayString = formatDateToYYYYMMDD(position.date)
+        if (assignedStaffUUIDsByDay[dayString]) {
+          const updatedPosition = {...position}
+          updatedPosition.assignedStaffs = assignedStaffUUIDsByDay[dayString].map(uuid => staffsDict[uuid])
+          console.log(updatedPosition)
+          const result = await updatePositionOnBackend(updatedPosition)
+          if (!result.ok) {
+            console.log("error happened while updating a Position. ", position)
+          }
+        }
+      }
     }
   }
 
@@ -164,6 +183,9 @@ const AssignTable: React.FC<{
         </tbody>
       </table>
     </DragDropContext>
+    <Box mt={2}>
+      <Button fullWidth={true} variant={"contained"} onClick={onSave}>保存</Button>
+    </Box>
   </div>
 }
 

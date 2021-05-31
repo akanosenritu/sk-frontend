@@ -2,7 +2,8 @@ import {v4} from "uuid"
 import {eachDayOfInterval} from "date-fns"
 import {ClothesSetting} from "./clothes"
 import {GatheringPlaceSetting} from "./gatheringPlace"
-import {PositionGroup, PositionData, PositionDataNullable, Position, ValueWithDefault} from "../types/positions"
+import {PositionGroup, PositionData, PositionDataNullable, ValueWithDefault} from "../types/positions"
+import {Position} from "../types/position"
 import {getIntervals} from "./time"
 import {isCreatedData, isNotCreatedData} from "./object"
 
@@ -40,6 +41,7 @@ const createDefaultPosition = (params: CreateDefaultPosition): Position => {
     uuid: v4(),
     date: params.date,
     isSaved: false,
+    assignedStaffs: [],
     data: {
       isSaved: false,
       uuid: v4(),

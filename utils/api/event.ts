@@ -1,4 +1,4 @@
-import {Failure, get, postWritable, SuccessWithData} from "./api"
+import {Failure, getWithJWT, postWritable, SuccessWithData} from "./api"
 import {APIEvent, WritableAPIEvent} from "../../types/api"
 import {Event, PositionGroup} from "../../types/positions"
 import {
@@ -36,7 +36,7 @@ export const convertAPIEventToWritableAPIEvent = (apiEvent: APIEvent): WritableA
 }
 
 export const getEvents = async (): Promise<SuccessWithData<Event[]>|Failure> => {
-  const result = await get<APIEvent[]>("events/")
+  const result = await getWithJWT<APIEvent[]>("events/")
   if (result.ok) {
     return {
       ...result,
@@ -75,4 +75,14 @@ export const createEventOnBackend = async (event: Event): Promise<SuccessWithDat
     }
   }
   return result
+}
+
+export const eventsFetcher = (): Promise<Event[]> => {
+  return getEvents()
+    .then(result => {
+      if (result.ok) return result.data
+      else {
+        throw new Error()
+      }
+    })
 }

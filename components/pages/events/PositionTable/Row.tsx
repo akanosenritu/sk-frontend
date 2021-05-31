@@ -1,7 +1,7 @@
 import {MyRow} from "../../../../utils/positionTable"
 import {CellWithDefault} from "./Cells"
 import React from "react"
-import {Position} from "../../../../types/positions"
+import {Position} from "../../../../types/position"
 
 const Row: React.FC<{
   row: MyRow,

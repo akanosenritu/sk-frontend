@@ -1,6 +1,7 @@
 import React from "react"
 import StaffItem from "./StaffItem"
-import {Position, PositionGroup} from "../../../../types/positions"
+import {Position} from "../../../../types/position"
+import {PositionGroup} from "../../../../types/positions"
 import {detectNumberOfPeopleDiscrepancies} from "../../../../utils/assign/assign"
 import {getPositionStaffNumbers} from "../../../../utils/event/positionData"
 import {getStaffCounts, useStaffsDict} from "../../../../utils/staff"
