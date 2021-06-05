@@ -42,7 +42,6 @@ type State = {
 export const useUser = create<State>(set => ({
   user: getCheckingUser(),
   checkUserStatus: async () => {
-    console.log("checking...")
     const result = await checkUser()
     if (result.ok) set({user: getAuthenticatedUser(result.data)})
     else set({user: getAnonymousUser()})
