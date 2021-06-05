@@ -1,15 +1,15 @@
 import React from "react"
 
-import Layout from '../components/Layout'
 import Index from "../components/pages/Index"
 import "react-big-calendar/lib/css/react-big-calendar.css"
+import BareLayout from "../components/BareLayout"
 
 const IndexPage = () => (
-  <Layout title="Home | Next.js + TypeScript Example">
+  <BareLayout title="管理アプリ">
     <div >
       <Index />
     </div>
-  </Layout>
+  </BareLayout>
 )
 
 export default IndexPage
