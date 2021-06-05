@@ -1,14 +1,14 @@
 import React, {useState} from "react"
-import PositionTable from "../PositionTable/PositionTable"
+import PositionTable from "../pages/events/PositionTable/PositionTable"
 import {Box, IconButton, InputBase, Typography} from "@material-ui/core"
-import {Setting} from "../../../../utils/setting"
+import {Setting} from "../../utils/setting"
 import PositionManagerEditor from "./PositionManagerEditor"
-import {PositionGroup, PositionDataNullable} from "../../../../types/positions"
-import {Position} from "../../../../types/position"
+import {PositionGroup, PositionDataNullable} from "../../types/positions"
+import {Position} from "../../types/position"
 import {v4} from "uuid"
 import DeleteIcon from '@material-ui/icons/Delete'
-import {PositionEditorDialog} from "../PositionTable/Dialogs"
-import {getIndexOfMatchingPositionData, getPositionDataOrDefaultData} from "../../../../utils/positions"
+import {PositionEditorDialog} from "../pages/events/PositionTable/Dialogs"
+import {getIndexOfMatchingPositionData, getPositionDataOrDefaultData} from "../../utils/positions"
 import produce from "immer"
 
 const PositionManager: React.FC<{

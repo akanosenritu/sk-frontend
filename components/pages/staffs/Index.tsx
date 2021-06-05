@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Box, Button, Typography} from "@material-ui/core"
 import {makeStyles} from "@material-ui/core"
 import {useRouter} from "next/router"
 import PageWithDrawer from "../PageWithDrawer"
-import {RegisteredStaff} from "../../../types/staffs"
 
 const useStyles = makeStyles({
   calendarBox: {
@@ -28,8 +27,6 @@ const Index: React.FC = () => {
   const classes = useStyles()
   const router = useRouter()
 
-  const [staffs, setStaffs] = useState<RegisteredStaff[]>([])
-
   return <PageWithDrawer>
     <Box className={classes.titleBox} mt={2}>
       <Typography variant={"h4"}>スタッフ管理</Typography>
@@ -49,7 +46,7 @@ const Index: React.FC = () => {
         <Box m={2}>現在利用可能なスタッフのリストが閲覧できます。</Box>
         <Box style={{display: "flex", justifyContent: "center"}} my={2}>
           <div>
-            <Button color={"primary"} variant={"contained"} onClick={()=>router.push("/staffs/new/")} disabled={true}>見る</Button>
+            <Button color={"primary"} variant={"contained"} onClick={()=>router.push("/staffs/list/")}>見る</Button>
           </div>
         </Box>
       </Box>

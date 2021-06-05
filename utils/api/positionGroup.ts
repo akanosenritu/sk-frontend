@@ -13,9 +13,10 @@ export const convertAPIPositionGroupToPositionGroup = (apiPositionGroup: APIPosi
   return {
     ...apiPositionGroup,
     defaultPositionData: convertAPIPositionDataNotNullableToPositionData(apiPositionGroup.default_position_data),
+    isEdited: false,
+    isSaved: true,
     positions: apiPositionGroup.positions.map(convertAPIPositionToPosition),
     positionColor: apiPositionGroup.position_color,
-    isSaved: true
   }
 }
 

@@ -24,16 +24,14 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const Index: React.FC = () => {
-  const {checkUserStatus, isCheckingUserStatus, updateUser} = useUser()
+  const {checkUserStatus, user} = useUser()
   useEffect(() => {
     checkUserStatus()
-      .then(user => {
-        updateUser(user)
-        if (user.status === "authenticated") router.push("/dashboard/")
-      })
   }, [])
   const classes = useStyles()
   const router = useRouter()
+
+  if (user.status === "authenticated") router.push("/dashboard/")
 
   return <Box　display={"flex"} justifyContent={"center"}>
     <div className={classes.paper}>
@@ -42,9 +40,6 @@ const Index: React.FC = () => {
           管理アプリ v.0
         </Typography>
       </Box>
-      {isCheckingUserStatus &&
-        <Box>サインイン情報を確認中</Box>
-      }
       <Box m={2}>
         <Button
           color={"primary"}

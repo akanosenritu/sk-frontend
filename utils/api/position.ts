@@ -14,6 +14,7 @@ export const convertAPIPositionToPosition = (apiPosition: APIPosition): Position
     ...apiPosition,
     data: convertAPIPositionDataToPositionDataNullable(apiPosition.data),
     date: new Date(apiPosition.date),
+    isEdited: false,
     isSaved: true,
     assignedStaffs: apiPosition.assigned_staffs.map(staff => convertAPIRegisteredStaffToRegisteredStaff(staff))
   }

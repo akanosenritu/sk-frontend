@@ -1,4 +1,4 @@
-import {Failure, getWithJWT, postWithJWT, SuccessWithData} from "./api"
+import {Failure, get, post, SuccessWithData} from "./api"
 import {GatheringPlaceSetting} from "../gatheringPlace"
 import {APIGatheringPlaceSetting} from "../../types/api"
 
@@ -14,7 +14,7 @@ export const convertGatheringPlaceSettingToAPIGatheringPlaceSetting = (gathering
 }
 
 export const getGatheringPlaceSettingsFromBackend = async (): Promise<SuccessWithData<GatheringPlaceSetting[]>|Failure> => {
-  const result = await getWithJWT<APIGatheringPlaceSetting[]>(
+  const result = await get<APIGatheringPlaceSetting[]>(
     "gathering-place-settings/"
   )
   if (result.ok) {
@@ -29,7 +29,7 @@ export const getGatheringPlaceSettingsFromBackend = async (): Promise<SuccessWit
 export const createGatheringPlaceSettingOnBackend = async (
   gatheringPlaceSetting: APIGatheringPlaceSetting
 ): Promise<SuccessWithData<GatheringPlaceSetting>|Failure> => {
-  const result = await postWithJWT<APIGatheringPlaceSetting>(
+  const result = await post<APIGatheringPlaceSetting>(
     "gathering-place-settings/",
     gatheringPlaceSetting
   )

@@ -1,9 +1,9 @@
 import React from 'react';
 import {Box} from "@material-ui/core"
-import MyDrawer from "./MyDrawer"
 import {makeStyles} from "@material-ui/core"
 import AccountBoxIcon from '@material-ui/icons/AccountBox'
 import {useUser} from "../../utils/user"
+import AuthenticationRequiredContent from "./AuthenticationRequiredContent"
 
 const useStyles = makeStyles({
   topBar: {
@@ -35,17 +35,14 @@ const Dashboard: React.FC = () => {
   const classes = useStyles()
   const {user} = useUser()
 
-  return <div>
-    <MyDrawer />
-    <Box>
-      <Box className={classes.topBar} m={2}>
-        <Box className={classes.topBarUserInfoBox}>
-          <AccountBoxIcon className={classes.topBarUserInfoBoxIcon} />
-          {user.status === "authenticated" && user.username}
-        </Box>
+  return <AuthenticationRequiredContent>
+    <Box className={classes.topBar} m={2}>
+      <Box className={classes.topBarUserInfoBox}>
+        <AccountBoxIcon className={classes.topBarUserInfoBoxIcon} />
+        {user.status === "authenticated" && user.username}
       </Box>
     </Box>
-  </div>
+  </AuthenticationRequiredContent>
 }
 
 export default Dashboard

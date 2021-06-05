@@ -1,21 +1,6 @@
 import create from "zustand"
 import {Failure, Success} from "./api/api"
-import {getUserInfo, refreshJWT, signIn, signOut} from "./api/user"
-
-export const setJWT = (jwt: JWT) => {
-  localStorage.setItem("jwt", JSON.stringify(jwt))
-}
-
-export const getJWT = (): JWT | null => {
-  const data = localStorage.getItem("jwt")
-  if (data) return JSON.parse(data) as JWT
-  return null
-}
-
-export const removeJWT = () => {
-  const data = localStorage.getItem("jwt")
-  if (data) localStorage.removeItem("jwt")
-}
+import {checkUser, signIn, signOut} from "./api/user"
 
 export const getStoredUserInfo = (): UserInfo | null => {
   const data = localStorage.getItem("userInfo")
@@ -31,6 +16,11 @@ const getAnonymousUser = (): AnonymousUser => ({
   status: "anonymous"
 })
 
+const getCheckingUser = (): CheckingUser => ({
+  status: "checking"
+})
+
+
 const getAuthenticatedUser = (userInfo: UserInfo): AuthenticatedUser => {
   return {
     status: "authenticated",
@@ -41,8 +31,7 @@ const getAuthenticatedUser = (userInfo: UserInfo): AuthenticatedUser => {
 
 type State = {
   user: User,
-  checkUserStatus: () => Promise<User>,
-  isCheckingUserStatus: boolean,
+  checkUserStatus: () => void,
   isSigningIn: boolean,
   signIn: (username: string, password: string) => Promise<Success | Failure>,
   signOut: () => Promise<Success | Failure>,
@@ -51,48 +40,22 @@ type State = {
 
 
 export const useUser = create<State>(set => ({
-  user: typeof window !== "undefined" && typeof window.localStorage !== "undefined" && getJWT()? // @ts-ignore
-    getStoredUserInfo()? getAuthenticatedUser(getStoredUserInfo()): getAnonymousUser():
-    getAnonymousUser(),
+  user: getCheckingUser(),
   checkUserStatus: async () => {
-    set(() => ({isCheckingUserStatus: true}))
-    let user: User | null = null
-    const jwt = getJWT()
-    if (!jwt) {
-      user = getAnonymousUser()
-    } else {
-      const userInfoRetrievalResult = await getUserInfo()
-      if (userInfoRetrievalResult.ok) {
-        user = getAuthenticatedUser(userInfoRetrievalResult.data)
-        storeUserInfo(userInfoRetrievalResult.data)
-      } else {
-        const refreshTokenResult = await refreshJWT()
-        if (refreshTokenResult.ok) {
-          const userInfoSecondRetrievalResult = await getUserInfo()
-          if (userInfoSecondRetrievalResult.ok) {
-            user = getAuthenticatedUser(userInfoSecondRetrievalResult.data)
-          }
-        }
-      }
-    }
-    if (user == null) user = getAnonymousUser()
-    set(()=>({isCheckingUserStatus: false}))
-    return user
+    console.log("checking...")
+    const result = await checkUser()
+    if (result.ok) set({user: getAuthenticatedUser(result.data)})
+    else set({user: getAnonymousUser()})
   },
-  isCheckingUserStatus: false,
   isSigningIn: false,
   signIn: async (username, password) => {
     set(() => ({isSigningIn: true}))
     const result = await signIn(username, password)
     set(() => ({isSigningIn: false}))
     if (result.ok) {
-      const userInfoRetrievalResult = await getUserInfo()
-      if (userInfoRetrievalResult) {
-        set(() => ({user: getAuthenticatedUser(userInfoRetrievalResult.data)}))
-        storeUserInfo(userInfoRetrievalResult.data)
-      } else {
-        return userInfoRetrievalResult
-      }
+      set({user: getAuthenticatedUser(result.data)})
+    } else {
+      set({user: getAnonymousUser()})
     }
     return result
   },

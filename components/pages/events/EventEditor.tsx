@@ -1,9 +1,7 @@
-import {Box, Button, makeStyles, TextField, Typography} from "@material-ui/core"
+import {Box, Button, TextField, Typography} from "@material-ui/core"
 import React, {ChangeEvent, useState} from "react"
-import MyCalendar from "../../MyCalendar"
 import {H5} from "../../Header"
 import {
-  convertPositionGroupToCalendarEvents,
   createDefaultPositionData,
   createPositionGroup,
 } from "../../../utils/positions"
@@ -14,57 +12,17 @@ import {PositionGroup} from "../../../types/positions"
 import {Event} from "../../../types/positions"
 import produce from "immer"
 import {validateEvent} from "../../../utils/event"
-import PositionManager from "./PositionManager/PositionManager"
-import {createEventOnBackend} from "../../../utils/api/event"
+import PositionManager from "../../PositionManager/PositionManager"
+import {saveEventOnBackend} from "../../../utils/api/event"
+import PositionGroupsCalendar from "../../PositionGroupsCalendar"
 
-const useStyles = makeStyles({
-  eventComponentPositionTitleInput: {
-    backgroundColor: "inherit",
-    border: "none",
-    color: "white",
-    marginRight: 10,
-    outline: "none",
-    padding: 0,
-    width: "100%",
-  }
-})
 
 type Props = {
   event: Event
 }
 
-// type EventEditorStatus = "Editing" | "Saving" | "Saved" | "SaveFailed"
-
 const EventEditor: React.FC<Props> = (props) => {
-  const classes = useStyles()
-  // const [status, setStatus] = useState<EventEditorStatus>("Editing")
   const [event, setEvent] = useState<Event>(props.event)
-
-  const EventComponent = (e: any) => {
-    const event: CalendarEvent<PositionGroup> = e.event
-    const positionGroup = event.data
-
-    const [positionTitle, setPositionTitle] = useState(positionGroup.title? positionGroup.title: "デフォルトの配置名")
-    const handlePositionTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
-      setPositionTitle(event.target.value)
-    }
-    const onBlurPositionTitleInput = () => {
-      if (positionTitle === "") {
-        setPositionTitle("デフォルトの配置名")
-      } else {
-        modifyPositionGroup({...positionGroup, title: positionTitle})
-      }
-    }
-
-    return <div style={{display: "flex", alignItems: "center"}}>
-      <div>
-        <button type={"button"} onClick={()=>deletePositionGroup(positionGroup)}>消</button>
-      </div>
-      <div style={{marginLeft: 5, width: "100%", flexGrow: 1}}>
-        <input value={positionTitle} onChange={handlePositionTitleChange} onSubmit={onBlurPositionTitleInput} className={classes.eventComponentPositionTitleInput} onBlur={onBlurPositionTitleInput}/>
-      </div>
-    </div>
-  }
 
   const getPositionGroupIndex = (searchingPositionGroup: PositionGroup) => {
     return event.positionGroups.findIndex(positionGroup => positionGroup.uuid === searchingPositionGroup.uuid)
@@ -72,13 +30,14 @@ const EventEditor: React.FC<Props> = (props) => {
   const addPositionGroup = (positionGroup: PositionGroup) => {
     setEvent(event => produce(event, draft => {
       draft.positionGroups = [...draft.positionGroups, positionGroup]
+      draft.isEdited = true
     }))
   }
-  const modifyPositionGroup = (positionGroup: PositionGroup) => {
-    const index = getPositionGroupIndex(positionGroup)
+  const modifyPositionGroup = (newPositionGroup: PositionGroup) => {
+    const index = getPositionGroupIndex(newPositionGroup)
     if (index === -1) return
     setEvent(event => produce(event, draft => {
-      draft.positionGroups[index] = positionGroup
+      draft.positionGroups[index] = {...newPositionGroup, isEdited: true}
     }))
   }
   const deletePositionGroup = (positionGroup: PositionGroup) => {
@@ -86,7 +45,25 @@ const EventEditor: React.FC<Props> = (props) => {
     if (index === -1) return
     setEvent(event => produce(event, draft => {
       draft.positionGroups.splice(index, 1)
+      draft.isEdited = true
     }))
+  }
+
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
+    setEvent(produce(event, draft => {
+      draft.title = e.target.value
+      draft.isEdited = true
+    }))
+  }
+
+  const {settings: clothesSettings, createSetting: createClothesSetting} = useClothesSettings()
+  const {settings: gatheringPlaceSettings, createSetting: createGatheringPlaceSetting} = useGatheringPlaceSettings()
+
+  const onSaveEvent = async () => {
+    const result = await saveEventOnBackend(event)
+    if (result.ok) {
+      setEvent(event)
+    }
   }
 
   const calendarOnSelectSlot = (start: Date, end: Date, action: "select" | "click" | "doubleClick") => {
@@ -99,26 +76,6 @@ const EventEditor: React.FC<Props> = (props) => {
       defaultPositionData: createDefaultPositionData(clothesSettings[0], gatheringPlaceSettings[0]),
     })
     addPositionGroup(newPosition)
-  }
-
-  const handleTitleChange = (e: ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
-    setEvent(produce(event, draft => {
-      draft.title = e.target.value
-    }))
-  }
-
-  const {settings: clothesSettings, createSetting: createClothesSetting} = useClothesSettings()
-  const {settings: gatheringPlaceSettings, createSetting: createGatheringPlaceSetting} = useGatheringPlaceSettings()
-
-  const getCalendarEvents = (): CalendarEvent<PositionGroup>[] => {
-    return event.positionGroups.map(pos => convertPositionGroupToCalendarEvents(pos)).flat()
-  }
-
-  const onSaveEvent = async () => {
-    const result = await createEventOnBackend(event)
-    if (result.ok) {
-      setEvent(event)
-    }
   }
 
   const {ok: isValid, errors: validateErrors} = validateEvent(event)
@@ -151,11 +108,11 @@ const EventEditor: React.FC<Props> = (props) => {
           ここで設定する配置は必ずしも現実の配置と一致する必要はありません。同じ服装・集合場所・集合場所を共有するひとまとまりのグループと考えてください。あまり細分化すると設定するのが大変です。
         </Typography>
       </Box>
-      <MyCalendar
-        events={getCalendarEvents()}
+      <PositionGroupsCalendar
+        deletePositionGroup={deletePositionGroup}
+        modifyPositionGroup={modifyPositionGroup}
         onSelectSlot={calendarOnSelectSlot}
-        views={["month"]}
-        components={{event: EventComponent}}
+        positionGroups={event.positionGroups}
       />
     </Box>
     <div />
@@ -206,13 +163,28 @@ const EventEditor: React.FC<Props> = (props) => {
         </ul>
       </Box>}
       <Box mt={1}>
-        <Button
-          color={"primary"}
-          disabled={!isValid}
-          fullWidth={true}
-          onClick={onSaveEvent}
-          variant={"contained"}
-        >作成</Button>
+        <Box>
+          <Button
+            color={"primary"}
+            disabled={!isValid}
+            fullWidth={true}
+            onClick={onSaveEvent}
+            variant={"contained"}
+          >
+            保存
+          </Button>
+        </Box>
+        <Box mt={1}>
+          <Button
+            color={"secondary"}
+            disabled={!isValid}
+            fullWidth={true}
+            onClick={onSaveEvent}
+            variant={"contained"}
+          >
+            戻る
+          </Button>
+        </Box>
       </Box>
     </Box>
     <div style={{height: "100vh"}}/>

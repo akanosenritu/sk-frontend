@@ -1,11 +1,11 @@
 import React, {ChangeEvent, useState} from "react"
 import {Box, Checkbox, MenuItem, Select, TextField} from "@material-ui/core"
-import {isValidRawTimeString, rawTimeToString, stringToRawTime} from "../../../../utils/time"
+import {isValidRawTimeString, rawTimeToString, stringToRawTime} from "../../utils/time"
 import {FormikErrors, useFormik} from "formik"
-import {ClothesSetting} from "../../../../utils/clothes"
-import {GatheringPlaceSetting} from "../../../../utils/gatheringPlace"
-import {PositionData, PositionDataNullable, ValueWithDefault} from "../../../../types/positions"
-import {getValueWithDefault} from "../../../../utils/positions"
+import {ClothesSetting} from "../../utils/clothes"
+import {GatheringPlaceSetting} from "../../utils/gatheringPlace"
+import {PositionData, PositionDataNullable, ValueWithDefault} from "../../types/positions"
+import {getValueWithDefault} from "../../utils/positions"
 
 export type PositionManagerEditorProps = {
   clothesSettings: ClothesSetting[],
@@ -80,6 +80,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
         gatheringPlace: !isFieldInheritingDefault["gatheringPlace"]?
           props.gatheringPlaceSettings.find(s => s.uuid === values.gatheringPlaceUUID) || formik.initialValues.gatheringPlace:
           null,
+        isEdited: true,
         isSaved: values.isSaved,
         male: !isFieldInheritingDefault["male"]? values.male: null,
         startHour: !isFieldInheritingDefault["startHour"]? stringToRawTime(values.startHourString) || formik.initialValues.startHour: null,

@@ -32,11 +32,18 @@ declare type MyEvent = {
 }
 
 declare type NotCreatedData = {
+  isEdited: boolean,
   isSaved: false,
   uuid: string
 }
 declare type CreatedData = {
+  isEdited: false,
   isSaved: true,
   uuid: string
 }
-declare type ObjectInfo = NotCreatedData | CreatedData
+declare type EditedData = {
+  isEdited: true,
+  isSaved: true,
+  uuid: string,
+}
+declare type ObjectInfo = NotCreatedData | CreatedData | EditedData

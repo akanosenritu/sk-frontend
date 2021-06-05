@@ -1,4 +1,4 @@
-import {Failure, getWithJWT, postWritable, SuccessWithData} from "./api"
+import {get, postWritable, putWritable} from "./api"
 import {APIEvent, WritableAPIEvent} from "../../types/api"
 import {Event, PositionGroup} from "../../types/positions"
 import {
@@ -6,6 +6,8 @@ import {
   convertPositionGroupToAPIPositionGroup,
   createPositionGrouponBackend
 } from "./positionGroup"
+import {getSuccessWithData} from "../result"
+import {useEffect, useState} from "react"
 
 export const convertAPIEventToEvent = (apiEvent: APIEvent): Event => {
   return {
@@ -13,6 +15,7 @@ export const convertAPIEventToEvent = (apiEvent: APIEvent): Event => {
     datetimeAdded: new Date(apiEvent.datetime_added),
     datetimeLastModified: new Date(apiEvent.datetime_last_modified),
     positionGroups: apiEvent.position_groups.map(convertAPIPositionGroupToPositionGroup),
+    isEdited: false,
     isSaved: true
   }
 }
@@ -36,7 +39,7 @@ export const convertAPIEventToWritableAPIEvent = (apiEvent: APIEvent): WritableA
 }
 
 export const getEvents = async (): Promise<SuccessWithData<Event[]>|Failure> => {
-  const result = await getWithJWT<APIEvent[]>("events/")
+  const result = await get<APIEvent[]>("events/")
   if (result.ok) {
     return {
       ...result,
@@ -46,7 +49,19 @@ export const getEvents = async (): Promise<SuccessWithData<Event[]>|Failure> => 
   return result
 }
 
-export const createEventOnBackend = async (event: Event): Promise<SuccessWithData<Event>|Failure> => {
+const createEventOnBackend = async (event: Event): Promise<SuccessWithData<APIEvent>|Failure> => {
+  return await postWritable<WritableAPIEvent, APIEvent>("events/", convertAPIEventToWritableAPIEvent(
+    convertEventToAPIEvent(event)
+  ))
+}
+
+const updateEventOnBackend = async (event: Event): Promise<SuccessWithData<APIEvent>|Failure> => {
+  return await putWritable<WritableAPIEvent, APIEvent>(`events/${event.uuid}`, convertAPIEventToWritableAPIEvent(
+    convertEventToAPIEvent(event)
+  ))
+}
+
+export const saveEventOnBackend = async (event: Event): Promise<SuccessWithData<Event>|Failure> => {
   const newEvent = {...event}
   const positionGroups: PositionGroup[] = []
   for (const positionGroup of event.positionGroups) {
@@ -65,9 +80,12 @@ export const createEventOnBackend = async (event: Event): Promise<SuccessWithDat
     }
   }
   newEvent.positionGroups = positionGroups
-  const result = await postWritable<WritableAPIEvent, APIEvent>("events/", convertAPIEventToWritableAPIEvent(
-    convertEventToAPIEvent(newEvent)
-  ))
+  let result: SuccessWithData<APIEvent> | Failure
+  if (!newEvent.isSaved) result = await createEventOnBackend(newEvent)
+  else {
+    if (newEvent.isEdited) result = await updateEventOnBackend(newEvent)
+    else result = getSuccessWithData(convertEventToAPIEvent(newEvent))
+  }
   if (result.ok) {
     return {
       ...result,
@@ -85,4 +103,28 @@ export const eventsFetcher = (): Promise<Event[]> => {
         throw new Error()
       }
     })
+}
+
+export const getEventByUUID = async (uuid: string): Promise<SuccessWithData<Event>|Failure> => {
+  const result = await get<APIEvent>(`events/${uuid}/`)
+  if (result.ok) {
+    return {
+      ok: true,
+      data: convertAPIEventToEvent(result.data)
+    }
+  }
+  return result
+}
+
+export const useEvent = (uuid: string) => {
+  const [event, setEvent] = useState<Event|null>(null)
+  const [error, setError] = useState<string|null>(null)
+  useEffect(() => {
+    getEventByUUID(uuid)
+      .then(result => {
+        if (result.ok) setEvent(result.data)
+        else setError(result.description)
+      })
+  }, [])
+  return {event, error}
 }

@@ -2,6 +2,7 @@ import React, {useMemo} from 'react';
 import {Event} from "../../../../types/positions"
 import MyCalendar from "../../../MyCalendar"
 import {getIntervals} from "../../../../utils/time"
+import {useRouter} from "next/router"
 
 const EventsCalendar: React.FC<{
   events: Event[]
@@ -24,7 +25,14 @@ const EventsCalendar: React.FC<{
     }
     return newCalendarEvents
   }, [props.events])
-  return <MyCalendar events={calendarEvents} onSelectSlot={()=>{}} />
+
+  const router = useRouter()
+  const onDoubleClickEvent = (calendarEvent: CalendarEvent<Event>) => {
+    const event = calendarEvent.data
+    router.push(`/events/${event.uuid}/`)
+  }
+
+  return <MyCalendar events={calendarEvents} onSelectSlot={()=>{}} onDoubleClickEvent={onDoubleClickEvent}/>
 }
 
 export default EventsCalendar

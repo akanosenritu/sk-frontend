@@ -12,6 +12,7 @@ export const createDefaultPositionData = (
   gatheringPlaceSetting: GatheringPlaceSetting
 ): PositionData => {
   return {
+    isEdited: false,
     isSaved: false,
     uuid: v4(),
     startHour: {hour: 8, minute: 0},
@@ -40,9 +41,11 @@ const createDefaultPosition = (params: CreateDefaultPosition): Position => {
   return {
     uuid: v4(),
     date: params.date,
+    isEdited: false,
     isSaved: false,
     assignedStaffs: [],
     data: {
+      isEdited: false,
       isSaved: false,
       uuid: v4(),
       startHour: params.startHour || null,
@@ -68,6 +71,7 @@ export const createPositionGroup = (params: CreatePositionGroupParams): Position
   const positionGroup: PositionGroup = {
     uuid: positionUUID ,
     title: params.title,
+    isEdited: false,
     isSaved: false,
     defaultPositionData: params.defaultPositionData,
     positions: [],
@@ -79,7 +83,6 @@ export const createPositionGroup = (params: CreatePositionGroupParams): Position
       parentPosition: positionGroup
     })
   })
-  console.log(positionGroup)
   return positionGroup
 }
 

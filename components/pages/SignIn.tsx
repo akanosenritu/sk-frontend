@@ -41,11 +41,11 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const SignIn: React.FC = () => {
-  const {user, checkUserStatus, isSigningIn, signIn, updateUser} = useUser()
+  const {user, checkUserStatus, isSigningIn, signIn} = useUser()
+  console.log(user, checkUserStatus, isSigningIn, signIn)
   const router = useRouter()
   useEffect(() => {
     checkUserStatus()
-      .then(user => updateUser(user))
   }, [])
 
   if (user.status === "authenticated") router.push("/dashboard/")

@@ -1,45 +1,26 @@
-import {Failure, getWithJWT, post, Success, SuccessWithData} from "./api"
-import {getJWT, removeJWT, setJWT} from "../user"
+import {Failure, get, post, Success, SuccessWithData} from "./api"
 
-export const signIn = async (username: string, password: string) => {
-  const result = await post("token/", {username, password})
-  if (result.ok) {
-    setJWT(result.data as unknown as JWT)
-  }
-  return result
-}
-
-export const signOut = async (): Promise<Success> => {
-  removeJWT()
-  return {
-    ok: true,
-  }
-}
-
-export const getUserInfo = async (): Promise<SuccessWithData<UserInfo>|Failure> => {
-  const result = await getWithJWT("get-user/")
+export const signIn = async (username: string, password: string): Promise<SuccessWithData<UserInfo> | Failure> => {
+  const result = await post("login/", {username, password})
   if (result.ok) {
     return {
       ok: true,
-      data: result.data as UserInfo
+      data: result.data as unknown as UserInfo
     }
   }
   return result
 }
 
-export const refreshJWT = async (): Promise<Success|Failure> => {
-  const jwt = getJWT()
-  if (!jwt) return {
-    ok: false,
-    description: "refresh token was not found."
-  }
-  const refreshToken = jwt.refresh
-  const result = await post("token/refresh/", {refresh: refreshToken})
+export const signOut = async (): Promise<Success|Failure> => {
+  return await post("logout", {})
+}
+
+export const checkUser = async (): Promise<SuccessWithData<UserInfo>|Failure> => {
+  const result = await get("check-user/")
   if (result.ok) {
-    const jwt = result.data as unknown as JWT
-    setJWT(jwt)
     return {
-      ok: true
+      ok: true,
+      data: result.data as UserInfo
     }
   }
   return result

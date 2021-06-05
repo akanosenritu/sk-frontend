@@ -17,6 +17,7 @@ export const createDefaultRegisteredStaff = (): RegisteredStaff => {
     isActive: true,
     telephoneNumber: "",
     emailAddress: "",
+    isEdited: false,
     isSaved: false,
   }
 }
@@ -43,7 +44,7 @@ export const createSampleStaffData = (dataArray: APIRegisteredStaff[]): Register
 export const sampleStaffDataArray = [
   {
     "uuid": "707dd85b-3018-46fb-a94a-1c4ae6c15eb0",
-    "staff_id": 1,
+    "staff_id": "1",
     "gender": "male",
     "last_name": "Lincoln",
     "last_name_kana": "リンカーン",
@@ -64,7 +65,7 @@ export const sampleStaffDataArray = [
   },
   {
     "uuid": "0fe86d0d-c1f9-41a4-82cc-00f1d1e1f2d9",
-    "staff_id": 32,
+    "staff_id": "32",
     "gender": "male",
     "last_name": "Roosevelt",
     "last_name_kana": "ルーズベルト",
@@ -85,7 +86,7 @@ export const sampleStaffDataArray = [
   },
   {
     "uuid": "259b612a-6ef0-4dd1-8484-ef56a882d34f",
-    "staff_id": 45,
+    "staff_id": "45",
     "gender": "male",
     "last_name": "Trump",
     "last_name_kana": "トランプ",

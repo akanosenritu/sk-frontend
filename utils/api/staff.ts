@@ -1,6 +1,6 @@
 import {RegisteredStaff} from "../../types/staffs"
 import {format} from "date-fns"
-import {Failure, postWithJWT, SuccessWithData} from "./api"
+import {Failure, get, post, SuccessWithData} from "./api"
 
 export type APIRegisteredStaff = {
   uuid: string,
@@ -31,6 +31,7 @@ export const convertAPIRegisteredStaffToRegisteredStaff = (apiRegisteredStaff: A
     isActive: apiRegisteredStaff.is_active,
     telephoneNumber: apiRegisteredStaff.telephone_number,
     emailAddress: apiRegisteredStaff.email_address,
+    isEdited: false,
     isSaved: true,
   }
 }
@@ -53,7 +54,7 @@ export const convertRegisteredStaffToAPIRegisteredStaff = (registeredStaff: Regi
 }
 
 export const saveRegisteredStaffOnBackend = async (registeredStaff: RegisteredStaff): Promise<SuccessWithData<RegisteredStaff>|Failure> => {
-  const result = await postWithJWT("registered-staffs/", convertRegisteredStaffToAPIRegisteredStaff(registeredStaff))
+  const result = await post("registered-staffs/", convertRegisteredStaffToAPIRegisteredStaff(registeredStaff))
   if (result.ok) {
     return {
       ok: true,
@@ -61,4 +62,11 @@ export const saveRegisteredStaffOnBackend = async (registeredStaff: RegisteredSt
     }
   }
   return result
+}
+
+export const getStaffs = async (): Promise<RegisteredStaff[]> => {
+  const result = await get<APIRegisteredStaff[]>("registered-staffs/")
+  console.log(result)
+  if (result.ok) return result.data.map(staff => convertAPIRegisteredStaffToRegisteredStaff(staff))
+  else throw new Error(result.description)
 }

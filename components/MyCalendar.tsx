@@ -29,6 +29,7 @@ type View = "month" | "week" | "day" | "agenda"
 type Props = {
   events: CalendarEvent<any>[],
   onSelectSlot: (start: Date, end: Date, action: "select"|"click"|"doubleClick") => void,
+  onDoubleClickEvent?: (event: CalendarEvent<any>) => void,
   views?: View[],
   components?: {event: any}
 }
@@ -70,6 +71,7 @@ const MyCalendar: React.FC<Props> = (props) => {
       formats={formats}
       selectable={true}
       onSelectSlot={onSelectSlot}
+      onDoubleClickEvent={props.onDoubleClickEvent}
       components={props.components}
       popup={true}
       eventPropGetter={(event: CalendarEvent<any>) => {

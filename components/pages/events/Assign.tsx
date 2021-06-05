@@ -1,16 +1,22 @@
 import React, {useEffect, useState} from "react"
 import {Event} from "../../../types/positions"
-import AssignTable from "./AssignTable/AssignTable"
-import {convertAPIEventToEvent} from "../../../utils/api/event"
+import AssignTable from "./EventStaffAssignTable/AssignTable"
+import {getEventByUUID} from "../../../utils/api/event"
 import {sampleStaffData} from "../../../utils/staff"
 
-const Assign: React.FC = () => {
+
+const Assign: React.FC<{
+  eventUUID: string
+}> = (props) => {
 
   const [event, setEvent] = useState<Event|null>(null)
   useEffect(() => {
-    fetch("/api/events/")
-      .then(res => res.json())
-      .then(data => setEvent(convertAPIEventToEvent(data)))
+    getEventByUUID(props.eventUUID)
+      .then(result => {
+        if (result.ok) {
+          setEvent(result.data)
+        }
+      })
   }, [])
 
   return <div style={{width: "80%", margin: "auto"}}>

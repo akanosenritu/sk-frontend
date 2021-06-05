@@ -26,3 +26,14 @@ export const getGenderColor = (gender: Gender) => {
       return "white"
   }
 }
+
+export const getJapaneseTranslationForGender = (gender: Gender): string => {
+  switch (gender) {
+    case "male":
+      return "男"
+    case "female":
+      return "女"
+    case "unspecified":
+      return "未指定"
+  }
+}

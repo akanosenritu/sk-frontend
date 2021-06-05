@@ -65,7 +65,9 @@ const MyDrawer: React.FC<{}> = () => {
   const classes = useStyles()
   const router = useRouter()
   const pathname = router.pathname
-  const move = (destination: string) => router.push(destination)
+  const move = (destination: string) => {
+    router.push(destination)
+  }
 
   return <Box style={{width: 250}} mr={2}>
     <Drawer
@@ -81,7 +83,7 @@ const MyDrawer: React.FC<{}> = () => {
           <button
             className={classes.drawerItemButton}
             disabled={pathname === "/dashboard/"}
-            onChange={()=>move("/dashboard/")}
+            onClick={()=>move("/dashboard/")}
           >
             <div style={{display: "inline-block"}}>
               <DashboardIcon className={classes.drawerItemIcon} />
