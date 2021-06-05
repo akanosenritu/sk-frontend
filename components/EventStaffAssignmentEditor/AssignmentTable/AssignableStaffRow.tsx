@@ -1,6 +1,6 @@
 import React from 'react'
 import AssignableStaffCell from "./AssignableStaffCell"
-import {StaffUUIDsByDay} from "../../../../types/staffs"
+import {StaffUUIDsByDay} from "../../../types/staffs"
 
 const AssignableStaffRow: React.FC<{
   availableStaffsByDay: StaffUUIDsByDay,

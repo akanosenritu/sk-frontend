@@ -66,7 +66,6 @@ export const saveRegisteredStaffOnBackend = async (registeredStaff: RegisteredSt
 
 export const getStaffs = async (): Promise<RegisteredStaff[]> => {
   const result = await get<APIRegisteredStaff[]>("registered-staffs/")
-  console.log(result)
   if (result.ok) return result.data.map(staff => convertAPIRegisteredStaffToRegisteredStaff(staff))
   else throw new Error(result.description)
 }

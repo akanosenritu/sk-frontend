@@ -37,7 +37,7 @@ const EventDetail: React.FC<{
           <Box m={2}>イベント設定に基づいて、スタッフの割当を行います。</Box>
           <Box style={{display: "flex", justifyContent: "center"}} my={2}>
             <div>
-              <Button color={"primary"} variant={"contained"} onClick={()=>router.push(`/events/${event.uuid}/assign/`)} disabled={true}>見る</Button>
+              <Button color={"primary"} variant={"contained"} onClick={()=>router.push(`/events/${event.uuid}/assign/`)}>見る</Button>
             </div>
           </Box>
         </Box>

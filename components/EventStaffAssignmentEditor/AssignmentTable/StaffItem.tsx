@@ -1,8 +1,8 @@
 import React from "react"
 import {makeStyles} from "@material-ui/core"
-import {getGenderColor} from "../../../../utils/gender"
+import {getGenderColor} from "../../../utils/gender"
 import {Draggable} from "react-beautiful-dnd"
-import {RegisteredStaff} from "../../../../types/staffs"
+import {RegisteredStaff} from "../../../types/staffs"
 
 const useStyles = makeStyles({
   root: {
@@ -24,7 +24,6 @@ const useStyles = makeStyles({
 })
 
 const StaffItem: React.FC<{
-  id: string,
   index: number,
   staff: RegisteredStaff,
   dayString: string

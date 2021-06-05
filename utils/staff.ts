@@ -1,7 +1,8 @@
 import {RegisteredStaff, StaffsDict} from "../types/staffs"
 import create from "zustand"
-import {APIRegisteredStaff, convertAPIRegisteredStaffToRegisteredStaff} from "./api/staff"
+import {APIRegisteredStaff, convertAPIRegisteredStaffToRegisteredStaff, getStaffs} from "./api/staff"
 import {v4} from "uuid"
+import {useEffect, useMemo, useState} from "react"
 
 export const createDefaultRegisteredStaff = (): RegisteredStaff => {
   return {
@@ -120,3 +121,26 @@ export const useStaffsDict = create<{
   dict: createStaffsDict(sampleStaffData),
   setDict: (newDict) => set({dict: newDict})
 }))
+
+export const useStaffs = () => {
+  const [staffs, setStaffs] = useState<RegisteredStaff[]>([])
+
+  const search = (searchConditions: string) => {
+    retrieveStaffs()
+  }
+
+  const retrieveStaffs = () => {
+    getStaffs()
+      .then(staffs => setStaffs(staffs))
+  }
+  // initial load
+  useEffect(() => {
+    retrieveStaffs()
+  }, [])
+
+  const staffsDict = useMemo<{[uuid: string]: RegisteredStaff}>(()=>{
+    return Object.fromEntries(staffs.map(staff => [staff.uuid, staff]))
+  }, [staffs])
+
+  return {staffs, staffsDict, search}
+}

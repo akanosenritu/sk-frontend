@@ -1,8 +1,8 @@
 import React from "react"
 import Layout from "../../../components/Layout"
 import AuthenticationRequiredContent from "../../../components/pages/AuthenticationRequiredContent"
-import EventDetail from "../../../components/pages/events/EventDetail"
 import {GetServerSideProps} from "next"
+import Assign from "../../../components/pages/events/Assign"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const uuid = context.params && context.params.uuid
@@ -17,7 +17,7 @@ const Page: React.FC<{
 }> = (props) => {
   return <Layout>
     <AuthenticationRequiredContent>
-      <EventDetail eventUUID={props.uuid} />
+      <Assign eventUUID={props.uuid} />
     </AuthenticationRequiredContent>
   </Layout>
 }

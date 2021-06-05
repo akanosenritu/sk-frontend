@@ -1,14 +1,16 @@
 import React from "react"
-import {Position} from "../../../../types/position"
-import {PositionGroup} from "../../../../types/positions"
-import {formatDateToYYYYMMDD} from "../../../../utils/time"
+import {Position} from "../../../types/position"
+import {PositionGroup} from "../../../types/positions"
+import {formatDateToYYYYMMDD} from "../../../utils/time"
 import PositionCell from "./PositionCell"
 import EmptyCell from "./EmptyCell"
+import {RegisteredStaff} from "../../../types/staffs"
 
 const PositionGroupRow: React.FC<{
   positionGroup: PositionGroup,
   columnDays: string[],
   staffUUIDsByDay: {[dayString: string]: string[]}
+  staffsDict: {[staffUUID: string]: RegisteredStaff}
 }> = props => {
   const daysWithPosition: {[date: string]: Position|null} = Object.fromEntries(props.columnDays.map(day => [day, null]))
   for (const position of props.positionGroup.positions) {
@@ -23,7 +25,7 @@ const PositionGroupRow: React.FC<{
           id={`positionGroup===${props.positionGroup.uuid}===${day}`}
           position={position}
           positionGroup={props.positionGroup}
-          staffUUIDs={props.staffUUIDsByDay[day]}
+          staffs={props.staffUUIDsByDay[day].map(uuid => props.staffsDict[uuid])}
         />
       } else {
         return <EmptyCell />

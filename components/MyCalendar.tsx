@@ -27,11 +27,12 @@ const messages = {
 type View = "month" | "week" | "day" | "agenda"
 
 type Props = {
+  components?: {event: any},
   events: CalendarEvent<any>[],
-  onSelectSlot: (start: Date, end: Date, action: "select"|"click"|"doubleClick") => void,
   onDoubleClickEvent?: (event: CalendarEvent<any>) => void,
+  onSelectSlot?: (start: Date, end: Date, action: "select"|"click"|"doubleClick") => void,
+  selectable?: boolean,
   views?: View[],
-  components?: {event: any}
 }
 
 type SlotInfo = {
@@ -50,6 +51,7 @@ const getEnd = (end: Date, action: "select" | "click" | "doubleClick"): Date => 
 
 const MyCalendar: React.FC<Props> = (props) => {
   const onSelectSlot = (slotInfo: SlotInfo) => {
+    if (!props.onSelectSlot) return
     const action = slotInfo.action
     const start = typeof slotInfo.start === "string"? new Date(slotInfo.start): slotInfo.start
     const end = getEnd(typeof slotInfo.end === "string"? new Date(slotInfo.end): slotInfo.end, action)
@@ -69,7 +71,7 @@ const MyCalendar: React.FC<Props> = (props) => {
       culture={"ja-JP"}
       messages={messages}
       formats={formats}
-      selectable={true}
+      selectable={props.selectable !== undefined}
       onSelectSlot={onSelectSlot}
       onDoubleClickEvent={props.onDoubleClickEvent}
       components={props.components}

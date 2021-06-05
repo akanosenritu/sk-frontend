@@ -3,8 +3,6 @@ import {RegisteredStaff} from "../../../types/staffs"
 import {Box, Button, Grid, MenuItem, Select, TextField, Typography} from "@material-ui/core"
 import {FormikErrors, useFormik} from "formik"
 import {H5} from "../../Header"
-import {KeyboardDatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers"
-import DateFnsUtils from "@date-io/date-fns"
 import {saveRegisteredStaffOnBackend} from "../../../utils/api/staff"
 import {useRouter} from "next/router"
 
@@ -15,14 +13,21 @@ const StaffEditor: React.FC<{
 }> = (props) => {
   const router = useRouter()
   const formik = useFormik({
-    initialValues: props.staff,
+    initialValues: {
+      ...props.staff,
+      birthDateString: "",
+    },
     validate: values => {
+      // TODO: Write Validator!
       const errors: FormikErrors<RegisteredStaff> = {}
       return errors
     },
     onSubmit: async (values) => {
       setStatus("saving")
-      const result = await saveRegisteredStaffOnBackend(values)
+      const result = await saveRegisteredStaffOnBackend({
+        ...values,
+        birthDate: new Date(values.birthDateString)
+      })
       if (result.ok) {
         setStatus("saved")
       } else {
@@ -134,22 +139,19 @@ const StaffEditor: React.FC<{
             />
           </Grid>
           <Grid item xs={9}>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <KeyboardDatePicker
-                disableToolbar={true}
-                error={!!formik.errors.birthDate}
-                format={"yyyy/MM/dd"}
-                fullWidth={true}
-                helperText={formik.errors.birthDate}
-                InputLabelProps={{shrink: true}}
-                label={"生年月日*"}
-                name={"birthDate"}
-                onChange={formik.handleChange}
-                style={{marginTop: 20}}
-                value={formik.values.birthDate}
-                variant={"inline"}
-              />
-            </MuiPickersUtilsProvider>
+            <TextField
+              fullWidth={true}
+              InputLabelProps={{
+                shrink: true
+              }}
+              label={"生年月日*"}
+              name={"birthDateString"}
+              onChange={formik.handleChange}
+              style={{marginTop: 20}}
+              type={"date"}
+              value={formik.values.birthDateString}
+              variant={"outlined"}
+            />
           </Grid>
           <Grid item xs={3}>
             <Select

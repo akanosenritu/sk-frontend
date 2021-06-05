@@ -32,7 +32,11 @@ const EventsCalendar: React.FC<{
     router.push(`/events/${event.uuid}/`)
   }
 
-  return <MyCalendar events={calendarEvents} onSelectSlot={()=>{}} onDoubleClickEvent={onDoubleClickEvent}/>
+  return <MyCalendar
+    events={calendarEvents}
+    onDoubleClickEvent={onDoubleClickEvent}
+    selectable={false}
+  />
 }
 
 export default EventsCalendar

@@ -1,16 +1,17 @@
 import React from "react"
 import StaffItem from "./StaffItem"
-import {Position} from "../../../../types/position"
-import {PositionGroup} from "../../../../types/positions"
-import {detectNumberOfPeopleDiscrepancies} from "../../../../utils/assign/assign"
-import {getPositionStaffNumbers} from "../../../../utils/event/positionData"
-import {getStaffCounts, useStaffsDict} from "../../../../utils/staff"
+import {Position} from "../../../types/position"
+import {PositionGroup} from "../../../types/positions"
+import {detectNumberOfPeopleDiscrepancies} from "../../../utils/assign/assign"
+import {getPositionStaffNumbers} from "../../../utils/event/positionData"
+import {getStaffCounts} from "../../../utils/staff"
 import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined'
 import CheckOutlinedIcon from '@material-ui/icons/CheckOutlined'
 
 import {makeStyles, Tooltip} from "@material-ui/core"
 import {Droppable} from "react-beautiful-dnd"
-import {formatDateToYYYYMMDD} from "../../../../utils/time"
+import {formatDateToYYYYMMDD} from "../../../utils/time"
+import {RegisteredStaff} from "../../../types/staffs"
 
 const useStyles = makeStyles({
   root: {
@@ -32,11 +33,9 @@ const PositionCell: React.FC<{
   id: string,
   position: Position,
   positionGroup: PositionGroup,
-  staffUUIDs: string[]
+  staffs: RegisteredStaff[]
 }> = props => {
-  const {position, positionGroup, staffUUIDs} = props
-  const {dict: staffsDict} = useStaffsDict()
-  const staffs = staffUUIDs.map(uuid => staffsDict[uuid])
+  const {position, positionGroup, staffs} = props
   const discrepancies = detectNumberOfPeopleDiscrepancies(
     getPositionStaffNumbers(position.data, positionGroup.defaultPositionData),
     getStaffCounts(staffs)
@@ -60,7 +59,6 @@ const PositionCell: React.FC<{
               return <StaffItem
                 dayString={formatDateToYYYYMMDD(props.position.date)}
                 key={`staffItem===${staff.uuid}===${formatDateToYYYYMMDD(position.date)}`}
-                id={`staffItem===${staff.uuid}===${formatDateToYYYYMMDD(position.date)}`}
                 index={index}
                 staff={staff}
               />

@@ -1,7 +1,7 @@
 import React from 'react';
 import StaffItem from "./StaffItem"
 import {Droppable} from "react-beautiful-dnd"
-import {useStaffsDict} from "../../../../utils/staff"
+import {useStaffsDict} from "../../../utils/staff"
 
 const AssignableStaffCell: React.FC<{
   availableStaffUUIDs: string[],
@@ -21,7 +21,6 @@ const AssignableStaffCell: React.FC<{
             return <StaffItem
               dayString={props.dayString}
               key={`staffItem===${staff.uuid}===${props.dayString}`}
-              id={`staffItem===${staff.uuid}===${props.dayString}`}
               index={index}
               staff={staff}
             />
