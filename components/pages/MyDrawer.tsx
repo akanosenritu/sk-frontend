@@ -6,6 +6,7 @@ import DashboardIcon from '@material-ui/icons/Dashboard'
 import GroupIcon from '@material-ui/icons/Group'
 import SettingsIcon from '@material-ui/icons/Settings'
 import ExitToAppIcon from '@material-ui/icons/ExitToApp'
+import EmojiPeopleIcon from '@material-ui/icons/EmojiPeople'
 import {useRouter} from "next/router"
 
 const useStyles = makeStyles({
@@ -88,7 +89,7 @@ const MyDrawer: React.FC<{}> = () => {
             <div style={{display: "inline-block"}}>
               <DashboardIcon className={classes.drawerItemIcon} />
             </div>
-            <span className={classes.drawerItemLink}>状態</span>
+            <span className={classes.drawerItemLink}>ポータル</span>
           </button>
         </Box>
         <Box p={2} className={classes.drawerItem}>
@@ -98,9 +99,21 @@ const MyDrawer: React.FC<{}> = () => {
             onClick={()=>move("/events/")}
           >
             <div style={{display: "inline-block"}}>
-              <AssignmentIcon className={classes.drawerItemIcon} />
+              <EmojiPeopleIcon className={classes.drawerItemIcon} />
             </div>
             <span className={classes.drawerItemLink}>イベント管理</span>
+          </button>
+        </Box>
+        <Box p={2} className={classes.drawerItem}>
+          <button
+            className={classes.drawerItemButton}
+            disabled={pathname==="/applications/"}
+            onClick={()=>move("/applications/")}
+          >
+            <div style={{display: "inline-block"}}>
+              <AssignmentIcon className={classes.drawerItemIcon} />
+            </div>
+            <span className={classes.drawerItemLink}>申込管理</span>
           </button>
         </Box>
         <Box p={2} className={classes.drawerItem}>

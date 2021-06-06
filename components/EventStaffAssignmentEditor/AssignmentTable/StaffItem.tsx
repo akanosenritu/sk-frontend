@@ -10,6 +10,8 @@ const useStyles = makeStyles({
     border: "1px solid #999999",
     color: "white",
     display: "flex",
+    height: 26,
+    overflow: "hidden",
     margin: 2,
   },
   hour: {
@@ -19,7 +21,7 @@ const useStyles = makeStyles({
   name: {
     borderLeft: "1px solid #999999",
     borderRight: "1px solid #999999",
-    flexGrow: 1
+    flexGrow: 1,
   }
 })
 

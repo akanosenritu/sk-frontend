@@ -25,7 +25,7 @@ export const detectNumberOfPeopleDiscrepancies = (
   // calculate female
   // whether female slots are filled
   if (required.female > current.female) result.female = required.female - current.female
-  let femaleOverFlow = Math.max(0, current.female - required.male)
+  let femaleOverFlow = Math.max(0, current.female - required.female)
 
   // calculate unspecified
   // whether unspecified slots are filled

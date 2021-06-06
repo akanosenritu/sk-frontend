@@ -91,4 +91,17 @@ test("detectNumberOfPeopleDiscrepancies", () => {
     female: 1,
     unspecified: 1
   })
+
+  expect(detectNumberOfPeopleDiscrepancies({
+    male: 1,
+    female: 2,
+    unspecified: 0
+  }, {
+    male: 1,
+    female: 2,
+  })).toStrictEqual({
+    male: 0,
+    female: 0,
+    unspecified: 0
+  })
 })

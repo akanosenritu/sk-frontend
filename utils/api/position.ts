@@ -5,7 +5,7 @@ import {
   convertPositionDataNullableToAPIPositionData,
   createPositionDataNullableOnBackend,
 } from "./positionData"
-import {Failure, postWritable, putWritable, SuccessWithData} from "./api"
+import {Failure, patchWritable, postWritable, putWritable, SuccessWithData} from "./api"
 import {format} from "date-fns"
 import {convertAPIRegisteredStaffToRegisteredStaff, convertRegisteredStaffToAPIRegisteredStaff} from "./staff"
 
@@ -87,4 +87,9 @@ export const updatePositionOnBackend = async (position: Position): Promise<Succe
     }
   }
   return result
+}
+
+export const updatePositionStaffAssignments = (positionUUID: string, assignedStaffUUIDs: string[]): Promise<Success|Failure> => {
+  const patchingData: Partial<WritableAPIPosition> = {assigned_staff_uuids: assignedStaffUUIDs}
+  return patchWritable(`positions/${positionUUID}/`, patchingData)
 }

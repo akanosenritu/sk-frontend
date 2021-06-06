@@ -5,6 +5,7 @@ import {FormikErrors, useFormik} from "formik"
 import {H5} from "../../Header"
 import {saveRegisteredStaffOnBackend} from "../../../utils/api/staff"
 import {useRouter} from "next/router"
+import {isValid} from "date-fns"
 
 type Status = "creating" | "saving" | "saved" | "editing" | "error"
 
@@ -19,7 +20,8 @@ const StaffEditor: React.FC<{
     },
     validate: values => {
       // TODO: Write Validator!
-      const errors: FormikErrors<RegisteredStaff> = {}
+      const errors: FormikErrors<RegisteredStaff & {birthDateString: string}> = {}
+      if (!isValid(new Date(values.birthDateString))) errors.birthDateString = "不正な年月日です。"
       return errors
     },
     onSubmit: async (values) => {
@@ -140,7 +142,9 @@ const StaffEditor: React.FC<{
           </Grid>
           <Grid item xs={9}>
             <TextField
+              error={!!formik.errors.birthDateString}
               fullWidth={true}
+              helperText={formik.errors.birthDateString}
               InputLabelProps={{
                 shrink: true
               }}
@@ -216,7 +220,7 @@ const StaffEditor: React.FC<{
             <Button
               color={"primary"}
               fullWidth={true}
-              onClick={()=>router.push("/staffs/new/")}
+              onClick={()=>router.reload()}
               variant={"contained"}
             >
               次のスタッフを作成する

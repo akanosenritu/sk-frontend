@@ -1,15 +1,20 @@
-import React, {useState} from "react"
-import {Event} from "../../../types/positions"
-import {Box, Button, Grid, makeStyles} from "@material-ui/core"
+import React, {useEffect, useMemo, useState} from "react"
+import {Event, PositionGroup} from "../../../types/positions"
+import {Box, Button, makeStyles} from "@material-ui/core"
 import DayHeader from "./DayHeader"
 import PositionGroupRow from "./PositionGroupRow"
 import {formatDateToYYYYMMDD} from "../../../utils/time"
-import {StaffPositionAssignments} from "../../../types/staffs"
+import {
+  StaffPositionAssignments,
+  StaffPositionAssignmentsForPositionGroup,
+  StaffPositionAssignmentsForUnassignedStaffs
+} from "../../../types/staffs"
 import {DragDropContext, DropResult} from "react-beautiful-dnd"
 import produce from "immer"
 import {useStaffs} from "../../../utils/staff"
-import {updatePositionOnBackend} from "../../../utils/api/position"
-import StaffsList from "../StaffsList/StaffsList"
+import {updatePositionStaffAssignments} from "../../../utils/api/position"
+import AssignableStaffRow from "./AssignableStaffRow"
+import {getAvailableStaffsForDates} from "../../../utils/api/staff"
 
 
 const useStyles = makeStyles({
@@ -40,9 +45,9 @@ const AssignmentTable: React.FC<{
 }> = props => {
   const classes = useStyles()
 
-  const {staffs, staffsDict, search: searchStaffs} = useStaffs()
+  const {staffsDict} = useStaffs()
 
-  const dayStrings: string[] = Array.from(
+  const dayStrings: string[] = useMemo<string[]>(() => Array.from(
     new Set(props.event.positionGroups
       .map(positionGroup => {
         return positionGroup.positions.map(
@@ -51,67 +56,118 @@ const AssignmentTable: React.FC<{
       })
       .flat()
     )
-  ).sort()
+  ).sort(), [props.event.positionGroups])
 
-  const [staffPositionAssignments, setStaffPositionAssignments] = useState<StaffPositionAssignments>(Object.fromEntries(props.event.positionGroups.map(positionGroup => {
-    return [
-      positionGroup.uuid,
-      {
+
+  const createInitialStaffPositionAssignments = (): StaffPositionAssignments => {
+    const createStaffPositionAssignmentsForPositionGroup = (positionGroup: PositionGroup): StaffPositionAssignmentsForPositionGroup => {
+      return {
         positionGroup,
-        assignedStaffUUIDsByDay: Object.fromEntries(positionGroup.positions.map(position => formatDateToYYYYMMDD(position.date)).map(dayString => {
-          return [dayString, []]
-        }))
+        assignedStaffUUIDsByDay: Object.fromEntries(
+          positionGroup.positions
+            .map(position => {
+              const dayString = formatDateToYYYYMMDD(position.date)
+              return [dayString, position.assignedStaffs.map(staff => staff.uuid)]
+            })
+        )
       }
-    ]
-  })))
+    }
+    const createStaffPositionAssignmentsForUnassignedStaffs = (): StaffPositionAssignmentsForUnassignedStaffs => {
+      return {
+        assignedStaffUUIDsByDay: Object.fromEntries(
+          dayStrings.map(dayString => {
+            return [dayString, [] as string[]]
+          })
+        )
+      }
+    }
+    const forPositionGroups = Object.fromEntries(props.event.positionGroups.map(positionGroup => {
+      return [
+        positionGroup.uuid,
+        createStaffPositionAssignmentsForPositionGroup(positionGroup)
+      ]
+    }))
+    return {
+      assigned: forPositionGroups,
+      unassigned: createStaffPositionAssignmentsForUnassignedStaffs()
+    }
+  }
+  // the state that handles assignments of all staffs related to this event.
+  // all available but unassigned staffs are stored with the key "unassigned" in the same way as staffs assigned are stored for each position group.
+  const [staffPositionAssignments, setStaffPositionAssignments] = useState<StaffPositionAssignments>(createInitialStaffPositionAssignments())
+
+  // retrieve available staffs from the server and set them to "unassigned" of staffPositionAssignments
+  useEffect(() => {
+    getAvailableStaffsForDates(dayStrings)
+      .then(result => {
+        if (result.ok) {
+          setStaffPositionAssignments(produce(staffPositionAssignments, draft => {
+            for (const dayString of dayStrings) {
+              draft.unassigned.assignedStaffUUIDsByDay[dayString] = result.data[dayString]
+                .sort((a, b) => {
+                  return a.staffId < b.staffId? -1: 1
+                })
+                .map(staff => staff.uuid)
+            }
+          }))
+        }
+      })
+  }, [])
+
+  const getPositionGroupUUIDWithThisStaffUUID = (staffUUID: string, dayString: string): string | undefined => {
+    return props.event.positionGroups
+      .map(positionGroup => positionGroup.uuid)
+      .find(positionGroupUUID => {
+        const staffUUIDs: string[] | undefined = staffPositionAssignments.assigned[positionGroupUUID].assignedStaffUUIDsByDay[dayString]
+        if (staffUUIDs) {
+          return new Set(staffUUIDs).has(staffUUID)
+        }
+        return false
+      })
+  }
 
   const assignStaffToPosition = (staffUUID: string, positionGroupUUID: string, dayString: string, index: number) => {
-    console.log(staffUUID, positionGroupUUID, dayString, index)
     setStaffPositionAssignments(old => produce(old, draft => {
+      const otherPositionGroupUUIDWithThisStaffUUID = getPositionGroupUUIDWithThisStaffUUID(staffUUID, dayString)
+
       // if other positionGroup have this staff, release him from it and reassign him to this.
-      const otherPositionGroupWithThisStaffUUID = props.event.positionGroups
-        .map(positionGroup => positionGroup.uuid)
-        .find(positionGroupUUID => {
-          const staffUUIDs: string[] | undefined = staffPositionAssignments[positionGroupUUID].assignedStaffUUIDsByDay[dayString]
-          if (staffUUIDs) {
-            return new Set(staffUUIDs).has(staffUUID)
-          }
-          return false
-        })
-      if (otherPositionGroupWithThisStaffUUID) {
-        const oldIndex = draft[otherPositionGroupWithThisStaffUUID].assignedStaffUUIDsByDay[dayString]
+      // else remove him from unassigned staffs pool.
+      if (otherPositionGroupUUIDWithThisStaffUUID) {
+        const oldIndex = draft.assigned[otherPositionGroupUUIDWithThisStaffUUID].assignedStaffUUIDsByDay[dayString]
           .findIndex(_staffUUID => _staffUUID === staffUUID)
         if (oldIndex !== -1) {
-          draft[otherPositionGroupWithThisStaffUUID].assignedStaffUUIDsByDay[dayString].splice(oldIndex, 1)
-          draft[positionGroupUUID].assignedStaffUUIDsByDay[dayString].splice(index, 0, staffUUID)
+          draft.assigned[otherPositionGroupUUIDWithThisStaffUUID].assignedStaffUUIDsByDay[dayString].splice(oldIndex, 1)
+          draft.assigned[positionGroupUUID].assignedStaffUUIDsByDay[dayString].splice(index, 0, staffUUID)
         }
       } else {
-        draft[positionGroupUUID].assignedStaffUUIDsByDay[dayString].splice(index, 0, staffUUID)
+        const oldIndex = draft.unassigned.assignedStaffUUIDsByDay[dayString]
+          .findIndex(_staffUUID => _staffUUID === staffUUID)
+        draft.assigned[positionGroupUUID].assignedStaffUUIDsByDay[dayString].splice(index, 0, staffUUID)
+        draft.unassigned.assignedStaffUUIDsByDay[dayString].splice(oldIndex, 1)
       }
     }))
   }
+  const unassignStaff = (staffUUID: string, dayString: string) => {
+    setStaffPositionAssignments(old => produce(old, draft => {
+      const positionGroupUUIDWithThisStaffUUID = getPositionGroupUUIDWithThisStaffUUID(staffUUID, dayString)
 
-  /**
-  const availableStaffsByDay = useMemo<StaffUUIDsByDay>(() => {
-    const assignedStaffUUIDsSetByDay: {[dayString: string]: Set<string>} = Object.fromEntries(dayStrings.map(dayString => [dayString, new Set<string>()]))
-    Object.values(staffPositionAssignments).map(assignmentForPositionGroup => {
-      return Object.entries(assignmentForPositionGroup.assignedStaffUUIDsByDay)
-    })
-      .flat()
-      .map(arr => {
-        const dayString = arr[0]
-        const staffUUIDs = arr[1]
-        assignedStaffUUIDsSetByDay[dayString] = new Set([...assignedStaffUUIDsSetByDay[dayString], ...staffUUIDs])
-    })
-    const availableStaffUUIDsSetByDay: {[dayString: string]: Set<string>} = Object.fromEntries(dayStrings.map(dayString => {
-      return [dayString, new Set<string>([...props.availableStaffUUIDsByDay[dayString]].filter(staff => !assignedStaffUUIDsSetByDay[dayString].has(staff)))]
+      // if other positionGroup have this staff, release him.
+      // then adds him to unassigned staff pool and sort the pool
+      if (positionGroupUUIDWithThisStaffUUID) {
+        const oldIndex = draft.assigned[positionGroupUUIDWithThisStaffUUID].assignedStaffUUIDsByDay[dayString]
+          .findIndex(_staffUUID => _staffUUID === staffUUID)
+        if (oldIndex !== -1) {
+          draft.assigned[positionGroupUUIDWithThisStaffUUID].assignedStaffUUIDsByDay[dayString].splice(oldIndex, 1)
+        }
+      }
+      draft.unassigned.assignedStaffUUIDsByDay[dayString].push(staffUUID)
+      draft.unassigned.assignedStaffUUIDsByDay[dayString].sort((a, b) => {
+        const staffA = staffsDict[a]
+        const staffB = staffsDict[b]
+        return staffA.staffId < staffB.staffId? -1: 1
+      })
     }))
-    console.log(availableStaffUUIDsSetByDay)
-    return Object.fromEntries(dayStrings.map(dayString => {
-      return [dayString, [...availableStaffUUIDsSetByDay[dayString]].sort((a, b) => staffsDict[a].lastName.toLowerCase() < staffsDict[b].lastName.toLowerCase()? -1: 1)]
-    }))
-  }, [staffPositionAssignments])
-   **/
+  }
 
   const onDragEnd = (result: DropResult) => {
     const {destination, draggableId} = result
@@ -126,69 +182,81 @@ const AssignmentTable: React.FC<{
       const positionGroupUUID = destinationIDTokens.shift() as string
       const dayString = destinationIDTokens.shift() as string
       assignStaffToPosition(staffUUID, positionGroupUUID, dayString, destination.index)
+    } else if (destinationType === "staffCell") {
+      console.log(destinationIDTokens)
+      const dayString = destinationIDTokens.shift() as string
+      console.log(dayString)
+      unassignStaff(staffUUID, dayString)
     }
   }
 
   const onSave = async () => {
-    const staffPositionAssignmentsForPositionGroups = Object.values(staffPositionAssignments)
+    const staffPositionAssignmentsForPositionGroups = Object.values(staffPositionAssignments.assigned)
     for (const {positionGroup, assignedStaffUUIDsByDay} of staffPositionAssignmentsForPositionGroups) {
       for (const position of positionGroup.positions) {
         const dayString = formatDateToYYYYMMDD(position.date)
-        if (assignedStaffUUIDsByDay[dayString]) {
-          const updatedPosition = {...position}
-          updatedPosition.assignedStaffs = assignedStaffUUIDsByDay[dayString].map(uuid => staffsDict[uuid])
-          console.log(updatedPosition)
-          const result = await updatePositionOnBackend(updatedPosition)
+        if (assignedStaffUUIDsByDay[dayString] != null) {
+          const result = await updatePositionStaffAssignments(position.uuid, assignedStaffUUIDsByDay[dayString])
           if (!result.ok) {
             console.log("error happened while updating a Position. ", position)
+          } else {
+            console.log("successfully updated position with new assignments of staffs.")
           }
         }
       }
     }
   }
 
+  /**
+  const assignedStaffUUIDsByDay = useMemo<{[dayString: string]: string[]}>(() => {
+    const assignedStaffUUIDsByDayByPositionGroups = Object.values(staffPositionAssignments).map(o => o.assignedStaffUUIDsByDay)
+    const result: {[dayString: string]: string[]} = {}
+    for (const dayString of dayStrings) {
+      result[dayString] = []
+      for (const assignedStaffUUIDsByDayByPositionGroup of assignedStaffUUIDsByDayByPositionGroups) {
+        if (assignedStaffUUIDsByDayByPositionGroup[dayString]) {
+          result[dayString] = result[dayString].concat(assignedStaffUUIDsByDayByPositionGroup[dayString])
+        }
+      }
+    }
+    return result
+  }, [staffPositionAssignments, dayStrings])
+  **/
+
   return <div>
     <DragDropContext
       onDragEnd={onDragEnd}
     >
-      <Grid container spacing={2}>
-        <Grid item xs={9}>
-          <table className={classes.table}>
-            <colgroup>
-              <col width={250}/>
-              <col width={250} />
-              <col width={250} />
-              <col width={250} />
-              <col width={250} />
-              <col width={250} />
-            </colgroup>
-            <thead>
-            <tr>
-              <td/>
-              {dayStrings.map(day => {
-                return <DayHeader dayString={day}/>
-              })}
-            </tr>
-            </thead>
-            <tbody>
-            {props.event.positionGroups.map(positionGroup => {
-              return <PositionGroupRow
-                columnDays={dayStrings}
-                positionGroup={positionGroup}
-                staffUUIDsByDay={staffPositionAssignments[positionGroup.uuid].assignedStaffUUIDsByDay}
-                staffsDict={staffsDict}
-              />
+      <table className={classes.table}>
+        <colgroup>
+          <col width={250}/>
+          {dayStrings.map(() => {
+            return <col width={250}/>
+          })}
+        </colgroup>
+        <thead>
+          <tr>
+            <td/>
+            {dayStrings.map(day => {
+              return <DayHeader dayString={day}/>
             })}
-            </tbody>
-          </table>
-        </Grid>
-        <Grid item xs={3}>
-          <StaffsList
-            search={searchStaffs}
-            staffs={staffs}
+          </tr>
+        </thead>
+        <tbody>
+          {props.event.positionGroups.map(positionGroup => {
+            return <PositionGroupRow
+              columnDays={dayStrings}
+              positionGroup={positionGroup}
+              staffUUIDsByDay={staffPositionAssignments.assigned[positionGroup.uuid].assignedStaffUUIDsByDay}
+              staffsDict={staffsDict}
+            />
+          })}
+          <AssignableStaffRow
+            availableStaffsByDay={staffPositionAssignments.unassigned.assignedStaffUUIDsByDay}
+            columnDays={dayStrings}
           />
-        </Grid>
-      </Grid>
+        </tbody>
+      </table>
     </DragDropContext>
     <Box mt={2}>
       <Button fullWidth={true} variant={"contained"} onClick={onSave}>保存</Button>

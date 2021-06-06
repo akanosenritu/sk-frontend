@@ -49,12 +49,16 @@ export const get = async <T>(target: string): Promise<SuccessWithData<T>|Failure
   }
 }
 
-export const getWithParams = async <T>(target: string, params: {[key: string]: string | undefined}): Promise<SuccessWithData<T>|Failure> => {
+export const getWithParams = async <T>(target: string, params: {[key: string]: string[] | undefined}): Promise<SuccessWithData<T>|Failure> => {
   let actualURL = new URL(apiURL + target, window.location.origin)
   if (params) {
     Object.entries(params).map(entry => {
-      const [key, value] = entry
-      if (value) actualURL.searchParams.append(key, value)
+      const [key, values] = entry
+      if (values) {
+        for (const value of values) {
+          actualURL.searchParams.append(key, value)
+        }
+      }
     })
   }
   try {
@@ -62,7 +66,7 @@ export const getWithParams = async <T>(target: string, params: {[key: string]: s
     if (res.ok) {
       return {
         ok: true,
-        data: await res.json()
+        data: await res.json() as T
       }
     }
     return {
@@ -166,12 +170,62 @@ export const put = async <T>(target: string, data: T): Promise<SuccessWithData<T
       data: e
     }
   }
-
 }
 
 export const putWritable = async <T, T2>(target: string, data:T): Promise<SuccessWithData<T2>|Failure> => {
   try {
     const result = await put<T>(target, data)
+    if (result.ok) {
+      return {
+        ...result,
+        data: result.data as unknown as T2
+      }
+    }
+    return result
+  } catch (e) {
+    return {
+      ok: false,
+      description: "unknown error",
+      data: e
+    }
+  }
+}
+
+export const patch = async <T>(target: string, data: Partial<T>): Promise<SuccessWithData<T>|Failure> => {
+  try {
+    const csrfToken = await getCsrfToken()
+    const response = await fetch(apiURL + target, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
+      },
+      body: JSON.stringify(data)
+    })
+    if (response.ok) {
+      const returnedData = await response.json()
+      return {
+        ok: true,
+        data: returnedData as T
+      }
+    }
+    return {
+      ok: false,
+      description: response.statusText,
+      data: await response.json(),
+    }
+  } catch (e) {
+    return {
+      ok: false,
+      description: "unknown error",
+      data: e
+    }
+  }
+}
+
+export const patchWritable = async <T, T2>(target: string, data: Partial<T>): Promise<SuccessWithData<T2>|Failure> => {
+  try {
+    const result = await patch<T>(target, data)
     if (result.ok) {
       return {
         ...result,

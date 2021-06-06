@@ -11,6 +11,7 @@ const AssignableStaffRow: React.FC<{
     {props.columnDays.map(day => {
       return <AssignableStaffCell
         id={`staffCell===${day}`}
+        key={`staffCell===${day}`}
         availableStaffUUIDs={props.availableStaffsByDay[day]}
         dayString={day}
       />

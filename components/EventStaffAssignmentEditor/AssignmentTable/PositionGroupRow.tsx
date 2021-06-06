@@ -20,15 +20,16 @@ const PositionGroupRow: React.FC<{
     <td>{props.positionGroup.title}</td>
     {props.columnDays.map(day => {
       const position = daysWithPosition[day]
-      if (position !== null) {
+      if (position != null) {
         return <PositionCell
           id={`positionGroup===${props.positionGroup.uuid}===${day}`}
+          key={`positionGroup===${props.positionGroup.uuid}===${day}`}
           position={position}
           positionGroup={props.positionGroup}
-          staffs={props.staffUUIDsByDay[day].map(uuid => props.staffsDict[uuid])}
+          staffs={props.staffUUIDsByDay[day].map(uuid => props.staffsDict[uuid]).filter(staff => staff)}
         />
       } else {
-        return <EmptyCell />
+        return <EmptyCell key={`positionGroup===${props.positionGroup.uuid}===${day}`}/>
       }
     })}
   </tr>

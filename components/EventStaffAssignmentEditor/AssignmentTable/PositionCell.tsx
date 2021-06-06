@@ -5,29 +5,29 @@ import {PositionGroup} from "../../../types/positions"
 import {detectNumberOfPeopleDiscrepancies} from "../../../utils/assign/assign"
 import {getPositionStaffNumbers} from "../../../utils/event/positionData"
 import {getStaffCounts} from "../../../utils/staff"
-import ErrorOutlineOutlinedIcon from '@material-ui/icons/ErrorOutlineOutlined'
-import CheckOutlinedIcon from '@material-ui/icons/CheckOutlined'
 
-import {makeStyles, Tooltip} from "@material-ui/core"
+import {makeStyles} from "@material-ui/core"
 import {Droppable} from "react-beautiful-dnd"
 import {formatDateToYYYYMMDD} from "../../../utils/time"
 import {RegisteredStaff} from "../../../types/staffs"
+import {getJapaneseTranslationForGender} from "../../../utils/gender"
 
 const useStyles = makeStyles({
   root: {
-    paddingBottom: "0 !important",
     borderCollapse: "separate"
   },
-  footer: {
-    alignItems: "center",
-    color: "darkgray",
-    display: "flex",
-    fontSize: 10,
-    justifyContent: "flex-end",
-    marginTop: 10,
-    verticalAlign: "middle"
-  }
 })
+
+const DisplayDiscrepancyInfoForGender: React.FC<{
+  gender: Gender,
+  discrepancies: {[gender in Gender]: number}
+}> = (props) => {
+  const {discrepancies, gender} = props
+  if (discrepancies[gender] === 0) return null
+  return <div>
+    {getJapaneseTranslationForGender(gender)}: {Math.abs(discrepancies[gender])}人{discrepancies[gender] < 0? "過剰": "不足"}
+  </div>
+}
 
 const PositionCell: React.FC<{
   id: string,
@@ -41,39 +41,38 @@ const PositionCell: React.FC<{
     getStaffCounts(staffs)
   )
   const isOk = Object.values(discrepancies).every(v => v === 0)
-  const errorMessage = `人数に過不足があります。男: ${discrepancies.male}、女: ${discrepancies.female}、未指定: ${discrepancies.unspecified}`
+  const totalNumberOfPeople = Object.values(getPositionStaffNumbers(position.data, positionGroup.defaultPositionData)).reduce((a, b) => a + b, 0)
   const classes = useStyles()
   return <td
     className={classes.root}
-    style={{backgroundColor: isOk? "": "#fefbd8", height: 1}}
+    style={{backgroundColor: isOk? "#ccffcc": "#fefbd8", height: 1}}
   >
-    <div style={{display:"flex", justifyContent: "flex-end", flexDirection: "column", height: "100%"}}>
+    <div style={{height: "100%", minHeight: totalNumberOfPeople * 30, display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
       <Droppable droppableId={props.id}>
         {provided => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            style={{flexGrow: 1}}
+            style={{flexGrow: 1, display: "flex", justifyContent: "space-between", flexDirection: "column"}}
           >
-            {staffs.map((staff, index) => {
-              return <StaffItem
-                dayString={formatDateToYYYYMMDD(props.position.date)}
-                key={`staffItem===${staff.uuid}===${formatDateToYYYYMMDD(position.date)}`}
-                index={index}
-                staff={staff}
-              />
-            })}
-            {provided.placeholder}
+            <div>
+              {staffs.map((staff, index) => {
+                return <StaffItem
+                  dayString={formatDateToYYYYMMDD(props.position.date)}
+                  key={`staffItem===${staff.uuid}===${formatDateToYYYYMMDD(position.date)}`}
+                  index={index}
+                  staff={staff}
+                />
+              })}
+              {provided.placeholder}
+            </div>
           </div>
         )}
       </Droppable>
-      <div className={classes.footer}>
-        {isOk?
-          <CheckOutlinedIcon/>:
-          <Tooltip title={errorMessage}>
-            <ErrorOutlineOutlinedIcon />
-          </Tooltip>
-        }
+      <div style={{height: 30 * Object.values(discrepancies).filter(d => d !== 0).length, marginTop: 30}}>
+        <DisplayDiscrepancyInfoForGender gender={"male"} discrepancies={discrepancies} />
+        <DisplayDiscrepancyInfoForGender gender={"female"} discrepancies={discrepancies} />
+        <DisplayDiscrepancyInfoForGender gender={"unspecified"} discrepancies={discrepancies} />
       </div>
     </div>
   </td>

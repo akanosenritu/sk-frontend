@@ -27,6 +27,11 @@ declare type StaffPositionAssignmentsForPositionGroup = {
   assignedStaffUUIDsByDay: StaffUUIDsByDay
 }
 
+declare type StaffPositionAssignmentsForUnassignedStaffs = {
+  assignedStaffUUIDsByDay: StaffUUIDsByDay,
+}
+
 type StaffPositionAssignments = {
-  [positionGroupUUID: string]: StaffPositionAssignmentsForPositionGroup
+  assigned: {[positionGroupUUID: string]: StaffPositionAssignmentsForPositionGroup},
+  unassigned: StaffPositionAssignmentsForUnassignedStaffs
 }
