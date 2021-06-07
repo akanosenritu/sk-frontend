@@ -1,9 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {Box, Button, Typography} from "@material-ui/core"
-import {makeStyles} from "@material-ui/core"
+import {Box, Button, makeStyles, Typography} from "@material-ui/core"
 import {useRouter} from "next/router"
 import {Event} from "../../../types/positions"
-import EventsCalendar from "./EventsTable/EventsCalendar"
+import EventsCalendar from "../../EventsTable/EventsCalendar"
 import PageWithDrawer from "../PageWithDrawer"
 import {getEvents} from "../../../utils/api/event"
 

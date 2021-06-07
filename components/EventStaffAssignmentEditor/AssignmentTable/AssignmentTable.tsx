@@ -15,6 +15,7 @@ import {useStaffs} from "../../../utils/staff"
 import {updatePositionStaffAssignments} from "../../../utils/api/position"
 import AssignableStaffRow from "./AssignableStaffRow"
 import {getAvailableStaffsForDates} from "../../../utils/api/staff"
+import {getDayStrings} from "../../../utils/event"
 
 
 const useStyles = makeStyles({
@@ -47,17 +48,7 @@ const AssignmentTable: React.FC<{
 
   const {staffsDict} = useStaffs()
 
-  const dayStrings: string[] = useMemo<string[]>(() => Array.from(
-    new Set(props.event.positionGroups
-      .map(positionGroup => {
-        return positionGroup.positions.map(
-          position => formatDateToYYYYMMDD(position.date)
-        )
-      })
-      .flat()
-    )
-  ).sort(), [props.event.positionGroups])
-
+  const dayStrings: string[] = useMemo<string[]>(() => getDayStrings(props.event), [props.event])
 
   const createInitialStaffPositionAssignments = (): StaffPositionAssignments => {
     const createStaffPositionAssignmentsForPositionGroup = (positionGroup: PositionGroup): StaffPositionAssignmentsForPositionGroup => {
@@ -170,8 +161,9 @@ const AssignmentTable: React.FC<{
   }
 
   const onDragEnd = (result: DropResult) => {
-    const {destination, draggableId} = result
+    const {destination, draggableId, source} = result
 
+    // if it is a drag to nowhere, do nothing.
     if (!destination) return
 
     const [staffUUID] = draggableId.split("===")
@@ -183,9 +175,11 @@ const AssignmentTable: React.FC<{
       const dayString = destinationIDTokens.shift() as string
       assignStaffToPosition(staffUUID, positionGroupUUID, dayString, destination.index)
     } else if (destinationType === "staffCell") {
-      console.log(destinationIDTokens)
+      // if it is a drag from staffCell to staffCell, do nothing.
+      // because reordering the staffCell doesn't have a meaning.
+      if (destination.droppableId === source.droppableId) return
+
       const dayString = destinationIDTokens.shift() as string
-      console.log(dayString)
       unassignStaff(staffUUID, dayString)
     }
   }

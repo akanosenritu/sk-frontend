@@ -124,14 +124,15 @@ export const useStaffsDict = create<{
 
 export const useStaffs = () => {
   const [staffs, setStaffs] = useState<RegisteredStaff[]>([])
-
-  const search = (searchConditions: string) => {
+  const [error, setError] = useState<string|null>(null)
+  const search = () => {
     retrieveStaffs()
   }
 
   const retrieveStaffs = () => {
     getStaffs()
       .then(staffs => setStaffs(staffs))
+      .catch(() => setError("Failed to retrieve staffs data."))
   }
   // initial load
   useEffect(() => {
@@ -142,5 +143,5 @@ export const useStaffs = () => {
     return Object.fromEntries(staffs.map(staff => [staff.uuid, staff]))
   }, [staffs])
 
-  return {staffs, staffsDict, search}
+  return {error, staffs, staffsDict, search}
 }

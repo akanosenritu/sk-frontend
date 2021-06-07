@@ -57,10 +57,11 @@ const PositionGroupsCalendar: React.FC<{
   }
 
   return <MyCalendar
+    components={{event: EventComponent}}
     events={calendarEvents}
     onSelectSlot={props.onSelectSlot}
+    selectable={true}
     views={["month"]}
-    components={{event: EventComponent}}
   />
 }
 

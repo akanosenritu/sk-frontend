@@ -1,10 +1,10 @@
 import React from "react"
 import {makeStyles, Typography} from "@material-ui/core"
-import {getGenderColor} from "../../../../utils/gender"
-import {prepareRows} from "../../../../utils/positionTable"
+import {getGenderColor} from "../../utils/gender"
+import {prepareRows} from "../../utils/positionTable"
 import Row from "./Row"
-import {PositionGroup} from "../../../../types/positions"
-import {Position} from "../../../../types/position"
+import {PositionGroup} from "../../types/positions"
+import {Position} from "../../types/position"
 
 const useStyles = makeStyles({
   table: {

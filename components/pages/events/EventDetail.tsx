@@ -46,7 +46,7 @@ const EventDetail: React.FC<{
           <Box m={2}>イベント設定とスタッフ割当に基づいて生成された個人別のメールの文面の編集を閲覧できます。</Box>
           <Box style={{display: "flex", justifyContent: "center"}} my={2}>
             <div>
-              <Button color={"primary"} variant={"contained"} onClick={()=>router.push(`/events/${event.uuid}/mails/`)} disabled={true}>見る</Button>
+              <Button color={"primary"} variant={"contained"} onClick={()=>router.push(`/events/${event.uuid}/mail/`)}>見る</Button>
             </div>
           </Box>
         </Box>

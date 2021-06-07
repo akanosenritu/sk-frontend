@@ -1,7 +1,7 @@
 import React, {useMemo} from 'react';
-import {Event} from "../../../../types/positions"
-import MyCalendar from "../../../MyCalendar"
-import {getIntervals} from "../../../../utils/time"
+import {Event} from "../../types/positions"
+import MyCalendar from "../MyCalendar"
+import {getIntervals} from "../../utils/time"
 import {useRouter} from "next/router"
 
 const EventsCalendar: React.FC<{
