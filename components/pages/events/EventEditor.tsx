@@ -1,28 +1,26 @@
 import {Box, Button, TextField, Typography} from "@material-ui/core"
 import React, {ChangeEvent, useState} from "react"
 import {H5} from "../../Header"
-import {
-  createDefaultPositionData,
-  createPositionGroup,
-} from "../../../utils/positions"
+import {createDefaultPositionData, createPositionGroup,} from "../../../utils/positions"
 import SettingsManagerBase from "./SettingsManagerBase"
 import {useClothesSettings, useGatheringPlaceSettings} from "../../../utils/setting"
 
-import {PositionGroup} from "../../../types/positions"
-import {Event} from "../../../types/positions"
+import {Event, PositionGroup} from "../../../types/positions"
 import produce from "immer"
 import {validateEvent} from "../../../utils/event"
 import PositionManager from "../../PositionManager/PositionManager"
 import {saveEventOnBackend} from "../../../utils/api/event"
 import PositionGroupsCalendar from "../../PositionGroupsCalendar"
+import {Alert} from "@material-ui/lab"
 
 
 type Props = {
   event: Event
 }
-
+type Status = "initial" | "editing" | "saving" | "saved" | "saveFailed"
 const EventEditor: React.FC<Props> = (props) => {
   const [event, setEvent] = useState<Event>(props.event)
+  const [status, setStatus] = useState<Status>("initial")
 
   const getPositionGroupIndex = (searchingPositionGroup: PositionGroup) => {
     return event.positionGroups.findIndex(positionGroup => positionGroup.uuid === searchingPositionGroup.uuid)
@@ -32,6 +30,7 @@ const EventEditor: React.FC<Props> = (props) => {
       draft.positionGroups = [...draft.positionGroups, positionGroup]
       draft.isEdited = true
     }))
+    setStatus("editing")
   }
   const modifyPositionGroup = (newPositionGroup: PositionGroup) => {
     const index = getPositionGroupIndex(newPositionGroup)
@@ -39,6 +38,7 @@ const EventEditor: React.FC<Props> = (props) => {
     setEvent(event => produce(event, draft => {
       draft.positionGroups[index] = {...newPositionGroup, isEdited: true}
     }))
+    setStatus("editing")
   }
   const deletePositionGroup = (positionGroup: PositionGroup) => {
     const index = getPositionGroupIndex(positionGroup)
@@ -47,6 +47,7 @@ const EventEditor: React.FC<Props> = (props) => {
       draft.positionGroups.splice(index, 1)
       draft.isEdited = true
     }))
+    setStatus("editing")
   }
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
@@ -54,15 +55,20 @@ const EventEditor: React.FC<Props> = (props) => {
       draft.title = e.target.value
       draft.isEdited = true
     }))
+    setStatus("editing")
   }
 
   const {settings: clothesSettings, createSetting: createClothesSetting} = useClothesSettings()
   const {settings: gatheringPlaceSettings, createSetting: createGatheringPlaceSetting} = useGatheringPlaceSettings()
 
   const onSaveEvent = async () => {
+    setStatus("saving")
     const result = await saveEventOnBackend(event)
     if (result.ok) {
       setEvent(event)
+      setStatus("saved")
+    } else {
+      setStatus("saveFailed")
     }
   }
 
@@ -163,10 +169,15 @@ const EventEditor: React.FC<Props> = (props) => {
         </ul>
       </Box>}
       <Box mt={1}>
+        {status === "saving" && <Alert severity={"info"}>イベントを保存中</Alert>}
+        {status === "saved" && <Alert severity={"success"}>イベントを保存しました</Alert>}
+        {status === "saveFailed" && <Alert severity={"error"}>イベントの保存に失敗しました</Alert>}
+      </Box>
+      <Box mt={1}>
         <Box>
           <Button
             color={"primary"}
-            disabled={!isValid}
+            disabled={!isValid　|| status !== "editing"}
             fullWidth={true}
             onClick={onSaveEvent}
             variant={"contained"}
@@ -174,20 +185,8 @@ const EventEditor: React.FC<Props> = (props) => {
             保存
           </Button>
         </Box>
-        <Box mt={1}>
-          <Button
-            color={"secondary"}
-            disabled={!isValid}
-            fullWidth={true}
-            onClick={onSaveEvent}
-            variant={"contained"}
-          >
-            戻る
-          </Button>
-        </Box>
       </Box>
     </Box>
-    <div style={{height: "100vh"}}/>
   </Box>
 }
 

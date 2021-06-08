@@ -1,9 +1,8 @@
 import React from 'react';
 import {RegisteredStaff} from "../../../../types/staffs"
-import {Box, TableBody, TableContainer, TableHead} from "@material-ui/core"
+import {Box, makeStyles, TableBody, TableContainer, TableHead} from "@material-ui/core"
 import HeaderRow from "./HeaderRow"
 import StaffRow from "./StaffRow"
-import {makeStyles} from "@material-ui/core"
 
 const useStyles = makeStyles({
   root: {
@@ -12,6 +11,8 @@ const useStyles = makeStyles({
     justifyContent: "center"
   }
 })
+
+// TODO: make it a good looking and virtualized table
 const StaffsList: React.FC<{
   staffs: RegisteredStaff[]
 }> = (props) => {

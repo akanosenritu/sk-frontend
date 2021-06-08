@@ -1,6 +1,5 @@
 import React from 'react';
-import {Box} from "@material-ui/core"
-import {makeStyles} from "@material-ui/core"
+import {Box, makeStyles, Typography} from "@material-ui/core"
 import AccountBoxIcon from '@material-ui/icons/AccountBox'
 import {useUser} from "../../utils/user"
 import AuthenticationRequiredContent from "./AuthenticationRequiredContent"
@@ -41,6 +40,9 @@ const Dashboard: React.FC = () => {
         <AccountBoxIcon className={classes.topBarUserInfoBoxIcon} />
         {user.status === "authenticated" && user.username}
       </Box>
+    </Box>
+    <Box display={"flex"} justifyContent={"center"}>
+      <Typography variant={"h4"}>工事中</Typography>
     </Box>
   </AuthenticationRequiredContent>
 }

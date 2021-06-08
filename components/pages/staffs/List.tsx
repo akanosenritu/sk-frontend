@@ -1,21 +1,26 @@
 import React from 'react'
-import PageWithDrawer from "../PageWithDrawer"
-import {Typography} from "@material-ui/core"
-import {getStaffs} from "../../../utils/api/staff"
-import {RegisteredStaff} from "../../../types/staffs"
-import useSWR from "swr"
+import {Box, Typography} from "@material-ui/core"
 import StaffsList from "./StaffsList/StaffsList"
+import {useStaffs} from "../../../utils/staff"
+import {ContentRetrievalFailedNotice, ContentRetrievingNotice} from "../RetrievalRequiredContent"
+import {BackButton} from "../../BackButton"
+import {useRouter} from "next/router"
 
 const List = () => {
-  const {data: staffs, error} = useSWR<RegisteredStaff[]>("fuck", getStaffs)
-  console.log(staffs, error)
-  return <PageWithDrawer>
+  const {staffs, error} = useStaffs()
+  const router = useRouter()
+  if (error) return <ContentRetrievalFailedNotice description={"スタッフの取得に失敗しました"} />
+  if (!staffs) return <ContentRetrievingNotice />
+  return <div>
+    <Box my={2}>
+      <BackButton onClick={()=>router.push(`/staffs/`)} />
+    </Box>
     <Typography variant={"h4"}>作成済みスタッフのリスト</Typography>
-    {staffs ?
-      <StaffsList staffs={staffs} />:
-      <div>スタッフリストの取得に失敗しました。<br />エラーメッセージ: {error}</div>
-    }
-  </PageWithDrawer>
+    <StaffsList staffs={staffs} />
+    <Box my={2}>
+      <BackButton onClick={()=>router.push(`/staffs/`)} />
+    </Box>
+  </div>
 };
 
 export default List

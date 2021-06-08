@@ -107,7 +107,7 @@ const MyDrawer: React.FC<{}> = () => {
         <Box p={2} className={classes.drawerItem}>
           <button
             className={classes.drawerItemButton}
-            disabled={pathname==="/applications/"}
+            disabled={true}
             onClick={()=>move("/applications/")}
           >
             <div style={{display: "inline-block"}}>
