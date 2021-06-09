@@ -1,6 +1,9 @@
 import type {AppProps} from "next/app"
 import "modern-css-reset/dist/reset.min.css"
 import {useEffect} from "react"
+import {QueryClient, QueryClientProvider} from "react-query"
+
+const queryClient = new QueryClient()
 
 function MyApp({Component, pageProps}: AppProps) {
   useEffect(() => {
@@ -11,9 +14,9 @@ function MyApp({Component, pageProps}: AppProps) {
     }
   }, []);
 
-  return <>
+  return <QueryClientProvider client={queryClient}>
     <Component {...pageProps} />
-  </>
+  </QueryClientProvider>
 }
 
 export default MyApp

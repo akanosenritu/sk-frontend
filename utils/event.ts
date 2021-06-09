@@ -3,6 +3,7 @@ import {Position} from "../types/position"
 import {v4} from "uuid"
 import {formatDateToYYYYMMDD} from "./time"
 import {compareAsc} from "date-fns"
+import {getValueWithDefault} from "./positions"
 
 export const createDefaultEvent = (): Event => ({
   title: "",
@@ -87,4 +88,45 @@ export const getAssignmentsByDayByStaff = (event: Event): AssignmentsByDayByStaf
     }
   }
   return assignmentByDayByStaff
+}
+
+type EventStatistics = {
+  totalNumberOfStaffsRequired: number,
+  totalNumberOfStaffsRequiredByGender: {[gender in Gender]: number},
+  totalNumberOfStaffsAssigned: number,
+  totalNumberOfStaffsAssignedByGender: {[gender in Gender]: number},
+}
+export const collectEventStatistics = (event: Event): EventStatistics => {
+  const required: {[gender in Gender]: number} = {male: 0, female: 0, unspecified: 0}
+  const assigned: {[gender in Gender]: number} = {male: 0, female: 0, unspecified: 0}
+  for (const positionGroup of event.positionGroups) {
+    for (const position of positionGroup.positions) {
+      // calculate required
+      const male = getValueWithDefault("male", position.data, positionGroup.defaultPositionData).value
+      required.male += male
+      const female = getValueWithDefault("female", position.data, positionGroup.defaultPositionData).value
+      required.female += female
+      const unspecified = getValueWithDefault("unspecified", position.data, positionGroup.defaultPositionData).value
+      required.unspecified += unspecified
+
+      // calculate assigned
+      let maleAssigned = 0
+      let femaleAssigned = 0
+      let unspecifiedAssigned = 0
+      for (const staff of position.assignedStaffs) {
+        if (staff.gender === "male") maleAssigned += 1
+        if (staff.gender === "female") femaleAssigned += 1
+        if (staff.gender === "unspecified") unspecifiedAssigned += 1
+      }
+      assigned.male += maleAssigned
+      assigned.female += femaleAssigned
+      assigned.unspecified += unspecifiedAssigned
+    }
+  }
+  return {
+    totalNumberOfStaffsRequired: required.male + required.female + required.unspecified,
+    totalNumberOfStaffsRequiredByGender: required,
+    totalNumberOfStaffsAssigned: assigned.male + assigned.female + assigned.unspecified,
+    totalNumberOfStaffsAssignedByGender: assigned,
+  }
 }

@@ -1,4 +1,4 @@
-import {get, postWritable, putWritable} from "./api"
+import {get, getWithParams, postWritable, putWritable} from "./api"
 import {APIEvent, WritableAPIEvent} from "../../types/api"
 import {Event, PositionGroup} from "../../types/positions"
 import {
@@ -38,15 +38,17 @@ export const convertAPIEventToWritableAPIEvent = (apiEvent: APIEvent): WritableA
   }
 }
 
-export const getEvents = async (): Promise<SuccessWithData<Event[]>|Failure> => {
-  const result = await get<APIEvent[]>("events/")
+type GetEventsParams = {
+  within_week?: string, // must be ISO formatted like YYYY-MM-DD
+}
+
+export const getEvents = async (params: GetEventsParams): Promise<Event[]> => {
+  const result = await getWithParams<APIEvent[]>("events/", params)
   if (result.ok) {
-    return {
-      ...result,
-      data: result.data.map(convertAPIEventToEvent)
-    }
+    return result.data.map(event => convertAPIEventToEvent(event))
+  } else {
+    throw new Error("Failed to retrieve events data.")
   }
-  return result
 }
 
 const createEventOnBackend = async (event: Event): Promise<SuccessWithData<APIEvent>|Failure> => {
@@ -93,16 +95,6 @@ export const saveEventOnBackend = async (event: Event): Promise<SuccessWithData<
     }
   }
   return result
-}
-
-export const eventsFetcher = (): Promise<Event[]> => {
-  return getEvents()
-    .then(result => {
-      if (result.ok) return result.data
-      else {
-        throw new Error()
-      }
-    })
 }
 
 export const getEventByUUID = async (uuid: string): Promise<SuccessWithData<Event>|Failure> => {

@@ -9,6 +9,17 @@ export const H5: React.FC = props => {
   </Typography>
 }
 
+export const NewH5: React.FC<{
+  title: string
+}> = props => {
+  return <>
+    <Typography variant={"h5"} style={{borderBottom: "1px solid black", paddingBottom: 3, marginBottom: 20}}>
+      {props.title}
+    </Typography>
+    {props.children}
+  </>
+}
+
 export const CollapsibleH5: React.FC<{
   title: string,
   isOpen: boolean,
@@ -16,7 +27,7 @@ export const CollapsibleH5: React.FC<{
   const [isOpen, setIsOpen] = useState(props.isOpen)
   return <>
     <Box display={"flex"} justifyContent={"space-between"} >
-      <Box flexGrow={1}>
+      <Box flexGrow={1} onClick={()=>setIsOpen(!isOpen)}>
         <Typography variant={"h5"} style={{borderBottom: "1px solid black", paddingBottom: 3, marginBottom: 20}}>{props.title}</Typography>
       </Box>
       <Box>

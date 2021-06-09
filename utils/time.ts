@@ -1,4 +1,5 @@
 import {compareAsc, differenceInCalendarDays, endOfDay, format} from "date-fns"
+import {ja} from "date-fns/locale"
 
 const rawTimeStringRegexPattern1 = /^([0-9]?[0-9]):?([0-9]{2})$/
 
@@ -114,4 +115,15 @@ export const getIntervals = (dates: Date[]): {start: Date, end: Date}[] => {
 
 export const formatDateToYYYYMMDD = (date: Date): string => {
   return format(date, "yyyy-MM-dd")
+}
+
+export const formatDateToMDEEE = (date: Date): string => {
+  return format(date, "M/d (eee)", {locale: ja})
+}
+
+export const getIntervalString = (interval: {start: Date, end: Date}): string => {
+  const startString = formatDateToMDEEE(interval.start)
+  const endString = formatDateToMDEEE(interval.end)
+  if (startString === endString) return startString
+  return `${startString}-${endString}`
 }

@@ -3,6 +3,7 @@ import {Event} from "../../types/positions"
 import MyCalendar from "../MyCalendar"
 import {getIntervals} from "../../utils/time"
 import {useRouter} from "next/router"
+import {getDates} from "../../utils/event"
 
 const EventsCalendar: React.FC<{
   events: Event[]
@@ -10,7 +11,7 @@ const EventsCalendar: React.FC<{
   const calendarEvents = useMemo<CalendarEvent<Event>[]>(() => {
     const newCalendarEvents: CalendarEvent<Event>[] = []
     for (const event of props.events) {
-      const dates = [...new Set<Date>(event.positionGroups.map(group => group.positions.map(pos => pos.date)).flat(2))]
+      const dates = getDates(event)
       const intervals = getIntervals(dates)
       for (const interval of intervals) {
         newCalendarEvents.push({
