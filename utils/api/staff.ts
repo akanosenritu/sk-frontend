@@ -65,7 +65,6 @@ export const saveRegisteredStaffOnBackend = async (registeredStaff: RegisteredSt
 }
 
 type GetStaffsParams = {
- staff_id?: string
 }
 export const getStaffs = async (params?: GetStaffsParams): Promise<RegisteredStaff[]> => {
   const result = await getWithParams<APIRegisteredStaff[]>("registered-staffs/", params)

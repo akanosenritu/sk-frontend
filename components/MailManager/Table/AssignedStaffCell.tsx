@@ -8,7 +8,6 @@ import {rawTimeToString} from "../../../utils/time"
 
 const useStyles = makeStyles({
   rightMostTd: {
-    borderRight: "5px solid darkgray"
   }
 })
 

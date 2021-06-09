@@ -7,7 +7,6 @@ import {
   createPositionGrouponBackend
 } from "./positionGroup"
 import {getSuccessWithData} from "../result"
-import {useEffect, useState} from "react"
 
 export const convertAPIEventToEvent = (apiEvent: APIEvent): Event => {
   return {
@@ -97,26 +96,11 @@ export const saveEventOnBackend = async (event: Event): Promise<SuccessWithData<
   return result
 }
 
-export const getEventByUUID = async (uuid: string): Promise<SuccessWithData<Event>|Failure> => {
+export const getEventByUUID = async (uuid: string): Promise<Event> => {
   const result = await get<APIEvent>(`events/${uuid}/`)
   if (result.ok) {
-    return {
-      ok: true,
-      data: convertAPIEventToEvent(result.data)
-    }
+    return convertAPIEventToEvent(result.data)
+  } else {
+    throw new Error("failed to retrieve the event.")
   }
-  return result
-}
-
-export const useEvent = (uuid: string) => {
-  const [event, setEvent] = useState<Event|null>(null)
-  const [error, setError] = useState<string|null>(null)
-  useEffect(() => {
-    getEventByUUID(uuid)
-      .then(result => {
-        if (result.ok) setEvent(result.data)
-        else setError(result.description)
-      })
-  }, [])
-  return {event, error}
 }

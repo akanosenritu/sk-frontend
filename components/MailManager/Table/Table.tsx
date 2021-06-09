@@ -8,6 +8,7 @@ import {Event} from "../../../types/positions"
 
 const useStyles = makeStyles({
   root: {
+    backgroundColor: "white",
     borderCollapse: "collapse",
     padding: 5,
     "& th": {
@@ -28,6 +29,7 @@ const useStyles = makeStyles({
 export const Table: React.FC<{
   assignedStaffsSortedArray: RegisteredStaff[],
   assignmentByDayByStaff: AssignmentsByDayByStaff,
+  confirmationDateLimit: Date | null,
   dates: Date[],
   dayStrings: string[],
   defaultMailTemplate: MailTemplate | null,
@@ -68,6 +70,7 @@ export const Table: React.FC<{
       {assignedStaffsSortedArray.map(staff => (
         <StaffRow
           assignmentsByDay={assignmentByDayByStaff[staff.uuid]}
+          confirmationDateLimit={props.confirmationDateLimit}
           dayStrings={dayStrings}
           defaultMailTemplate={props.defaultMailTemplate}
           event={props.event}

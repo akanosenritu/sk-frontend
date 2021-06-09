@@ -29,6 +29,7 @@ type MailSendStatus = "checking" | "sendable" | "notSendable" | "sending" | "sen
 
 export const MailSender: React.FC<{
   assignmentByDay: AssignmentsByDay,
+  confirmationDateLimit: Date,
   defaultMailTemplate: MailTemplate,
   event: Event,
   onClose: () => void,
@@ -38,7 +39,8 @@ export const MailSender: React.FC<{
 
   const [template, setTemplate] = useState<MailTemplate>(props.defaultMailTemplate)
 
-  const templateData = getTemplateData(props.staff, props.assignmentByDay, props.event)
+
+  const [templateData, setTemplateData] = useState(getTemplateData(props.staff, props.assignmentByDay, props.event, props.confirmationDateLimit))
   const mailText = Mustache.render(template.template, templateData)
 
   const onClickCopyTextToClipboard = () => {
@@ -88,6 +90,7 @@ export const MailSender: React.FC<{
             <MailTemplateManager
               template={template}
               onChangeTemplate={newTemplate => setTemplate(newTemplate)}
+              setTemplateData={setTemplateData}
               templateData={templateData}
             />
           </Box>

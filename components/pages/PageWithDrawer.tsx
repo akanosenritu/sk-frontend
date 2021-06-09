@@ -7,10 +7,9 @@ const useStyles = makeStyles({
     backgroundColor: "#f2f2f2",
     display: "flex",
     flexGrow: 1,
-    height: "100vh",
+    height: "100%",
     justifyContent: "center",
-    paddingLeft: 50,
-    paddingRight: 50,
+    minHeight: "100vh",
   },
   root: {
     display: "flex",
@@ -24,7 +23,7 @@ const PageWithDrawer: React.FC = (props) => {
   return <Box className={classes.root}>
     <MyDrawer />
     <Box className={classes.contentBox}>
-      <Box style={{flexGrow: 1}}>
+      <Box style={{flexGrow: 1, margin: 50}}>
         {props.children}
       </Box>
     </Box>

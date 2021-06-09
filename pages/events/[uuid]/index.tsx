@@ -1,7 +1,7 @@
 import React from "react"
 import Layout from "../../../components/Layout"
 import AuthenticationRequiredContent from "../../../components/pages/AuthenticationRequiredContent"
-import EventDetail from "../../../components/pages/events/EventDetail"
+import {Detail} from "../../../components/pages/events/event/Detail"
 import {GetServerSideProps} from "next"
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -15,9 +15,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const Page: React.FC<{
   uuid: string,
 }> = (props) => {
-  return <Layout>
+  return <Layout title={"イベント詳細ページ"}>
     <AuthenticationRequiredContent>
-      <EventDetail eventUUID={props.uuid} />
+      <Detail eventUUID={props.uuid} />
     </AuthenticationRequiredContent>
   </Layout>
 }

@@ -11,5 +11,6 @@ declare type Mail = {
 declare type MailsForEvent = {
   event: Event,
   defaultTemplate: MailTemplate | null,
-  mails: Mail[]
+  mails: Mail[],
+  confirmDateLimit: Date | null,
 } & ObjectInfo

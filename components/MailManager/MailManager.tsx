@@ -1,19 +1,20 @@
 import React, {useMemo} from "react"
-import {Box, Typography} from "@material-ui/core"
+import {Box, Paper} from "@material-ui/core"
 import {Event} from "../../types/positions"
 import {AssignmentsByDayByStaff, getAssignmentsByDayByStaff, getDayStrings} from "../../utils/event"
 import {RegisteredStaff, StaffsDict} from "../../types/staffs"
 
 import {Table} from "./Table/Table"
 import {MailsForEvent} from "../../types/mail"
-import {CollapsibleH5, H5} from "../Header"
+import {CollapsibleH5, NewH5} from "../Header"
 import {MailManagerDefaultMailTemplateSelector} from "./MailManagerDefaultMailTemplateSelector"
+import {MailManagerDefaultConfirmationDateLimitSetter} from "./MailManagerDefaultConfirmationDateLimitSetter"
 
 export const MailManager: React.FC<{
   event: Event,
   staffsDict: StaffsDict,
   mailsForEvent: MailsForEvent,
-  updateMailsForEvent: (mailsForEvent: MailsForEvent) => void,
+  updateMailsForEvent: (mailsForEvent: MailsForEvent) => Promise<Success|Failure>,
 }> = props => {
   const {staffsDict} = props
   const dayStrings = useMemo<string[]>(() => getDayStrings(props.event), [props.event])
@@ -30,40 +31,50 @@ export const MailManager: React.FC<{
   }, [assignmentByDayByStaff])
 
   const setDefaultMailTemplate = (newMailTemplate: MailTemplate) => {
-    props.updateMailsForEvent({
+    return props.updateMailsForEvent({
       ...props.mailsForEvent,
       defaultTemplate: newMailTemplate
     })
   }
 
-  return <Box>
-    <Typography variant={"h4"}>{props.event.title}</Typography>
-    <Box m={2}>
-      <Typography>
-        設定された配置、スタッフ割当に基づいて生成されたメールの文面を閲覧できます。メールの文面を閲覧するには表のメールアイコンをクリックしてください。
-      </Typography>
-    </Box>
-    <Box m={2} mt={5}>
-      <CollapsibleH5 title={"デフォルトのテンプレートを編集する"} isOpen={false}>
-        <Box mt={2}>
-          メール本文生成の際に使用されるテンプレートのデフォルトを設定します。
-        </Box>
+  const setConfirmDateLimit = (newConfirmDateLimit: Date) => {
+    return props.updateMailsForEvent({
+      ...props.mailsForEvent,
+      confirmDateLimit: newConfirmDateLimit
+    })
+  }
+
+  return <Box m={2}>
+    <Box mt={5}>
+      <CollapsibleH5 title={"デフォルトのテンプレートを設定する"} isOpen={false}>
         <MailManagerDefaultMailTemplateSelector
           defaultMailTemplate={props.mailsForEvent.defaultTemplate || null}
           setDefaultMailTemplate={setDefaultMailTemplate}
         />
       </CollapsibleH5>
     </Box>
-    <Box m={2} mt={5}>
-      <H5>生成されたメールを確認する</H5>
-      <Table
-        assignedStaffsSortedArray={assignedStaffsSortedArray}
-        assignmentByDayByStaff={assignmentByDayByStaff}
-        dates={dates}
-        dayStrings={dayStrings}
-        defaultMailTemplate={props.mailsForEvent.defaultTemplate}
-        event={props.event}
-      />
+    <Box mt={2}>
+      <NewH5 title={"確認期限を設定する"}>
+        <MailManagerDefaultConfirmationDateLimitSetter
+          defaultConfirmationDateLimit={props.mailsForEvent.confirmDateLimit}
+          setDefaultConfirmationDateLimit={setConfirmDateLimit}
+        />
+      </NewH5>
+    </Box>
+    <Box mt={2}>
+      <NewH5 title={"生成されたメールを確認する"}>
+        <Paper style={{padding: 10}}>
+          <Table
+            assignedStaffsSortedArray={assignedStaffsSortedArray}
+            assignmentByDayByStaff={assignmentByDayByStaff}
+            confirmationDateLimit={props.mailsForEvent.confirmDateLimit}
+            dates={dates}
+            dayStrings={dayStrings}
+            defaultMailTemplate={props.mailsForEvent.defaultTemplate}
+            event={props.event}
+          />
+        </Paper>
+      </NewH5>
     </Box>
   </Box>
 }

@@ -32,6 +32,7 @@
     "immer": "^9.0.2",
     "jest": "26.6.3",
     "js-cookie": "^2.2.1",
+    "material-table": "1.69.1",
     "modern-css-reset": "^1.4.0",
     "moment": "^2.29.1",
     "moment-range": "^4.0.2",

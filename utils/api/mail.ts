@@ -27,6 +27,7 @@ export type APIMailsForEvent = {
   uuid: string,
   event: APIEvent,
   default_template: APIMailTemplate | null,
+  confirm_date_limit: string | null,
   mails: APIMail[],
 }
 
@@ -61,7 +62,8 @@ export const convertMailsForEventToAPIMailsForEvent = (mailsForEvent: MailsForEv
     ...mailsForEvent,
     default_template: mailsForEvent.defaultTemplate,
     event: convertEventToAPIEvent(mailsForEvent.event),
-    mails: mailsForEvent.mails.map(mail => convertMailToAPIMail(mail))
+    mails: mailsForEvent.mails.map(mail => convertMailToAPIMail(mail)),
+    confirm_date_limit: mailsForEvent.confirmDateLimit? mailsForEvent.confirmDateLimit.toISOString(): null
   }
 }
 
@@ -71,6 +73,7 @@ export const convertAPIMailsForEventToMailsForEvent = (apiMailsForEvent: APIMail
     defaultTemplate: apiMailsForEvent.default_template? convertAPIMailTemplateToMailTemplate(apiMailsForEvent.default_template): null,
     event: convertAPIEventToEvent(apiMailsForEvent.event),
     mails: apiMailsForEvent.mails.map(mail => convertAPIMailToMail(mail)),
+    confirmDateLimit: apiMailsForEvent.confirm_date_limit? new Date(apiMailsForEvent.confirm_date_limit): null,
     isEdited: false,
     isSaved: true,
   }

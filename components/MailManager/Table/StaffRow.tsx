@@ -9,13 +9,12 @@ import {MailSender} from "../MailSender/MailSender"
 import {Event} from "../../../types/positions"
 
 const useStyles = makeStyles({
-  nameCell: {
-    borderRight: "5px solid darkgray"
-  }
+  nameCell: {}
 })
 
 export const StaffRow: React.FC<{
   assignmentsByDay: AssignmentsByDay,
+  confirmationDateLimit: Date | null,
   dayStrings: string[],
   defaultMailTemplate: MailTemplate | null,
   event: Event,
@@ -30,12 +29,14 @@ export const StaffRow: React.FC<{
   return <tr>
     <td>
       <Tooltip title={"メール本文を生成します。"}>
-        <IconButton disabled={!props.defaultMailTemplate} onClick={()=>setIsMailSenderOpen(true)}>
+        <IconButton disabled={!props.defaultMailTemplate || !props.confirmationDateLimit} onClick={()=>setIsMailSenderOpen(true)}>
           <MailOutlineIcon />
         </IconButton>
       </Tooltip>
-      {isMailSenderOpen && props.defaultMailTemplate && <MailSender
+      {isMailSenderOpen && props.defaultMailTemplate && props.confirmationDateLimit &&
+      <MailSender
         assignmentByDay={assignmentsByDay}
+        confirmationDateLimit={props.confirmationDateLimit}
         defaultMailTemplate={props.defaultMailTemplate}
         event={props.event}
         onClose={handleMailSenderClose}

@@ -12,6 +12,7 @@ export const useMailsForEvent = (eventUUID: string) => {
     } else {
       setError("Failed to update the mailsForEvent.")
     }
+    return result
   }
   useEffect(() => {
     getMailsForEvent(eventUUID)

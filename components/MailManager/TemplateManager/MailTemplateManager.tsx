@@ -1,9 +1,24 @@
 import React, {ChangeEvent, useState} from "react"
-import {Box, Grid, IconButton, InputBase, makeStyles, TextField, Typography} from "@material-ui/core"
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  InputBase,
+  makeStyles,
+  TextField,
+  Typography
+} from "@material-ui/core"
 import SaveIcon from '@material-ui/icons/Save'
 import RestoreIcon from '@material-ui/icons/Restore'
 import CreateIcon from '@material-ui/icons/Create'
-import {MailTemplateData, mailTemplateDataKeyDescriptions, mailTemplateDataKeys} from "../../../utils/mailTemplate"
+import {
+  MailTemplateData,
+  mailTemplateDataKeyDescriptions,
+  mailTemplateDataKeys,
+  TemplateDataKey
+} from "../../../utils/mailTemplate"
 import {createMailTemplate, updateMailTemplate} from "../../../utils/api/mailTemplate"
 
 const useStyles = makeStyles({
@@ -37,12 +52,22 @@ type Status = "initial" | "editing" | "saving" | "saved" | "error"
 
 export const MailTemplateManager: React.FC<{
   onChangeTemplate: (newTemplate: MailTemplate) => void,
+  setTemplateData: (newTemplateData: MailTemplateData) => void,
   template: MailTemplate,
   templateData: MailTemplateData,
 }> = props => {
   const classes = useStyles()
 
   const [status, setStatus] = useState<Status>("initial")
+
+  const [editingTemplateData, setEditingTemplateData] = useState(false)
+  const handleTemplateDataChange = (event: ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
+    const name = event.target.name as TemplateDataKey
+    props.setTemplateData({
+      ...props.templateData,
+      [name]: event.target.value
+    })
+  }
 
   const [templateName, setTemplateName] = useState(props.template.name)
   const handleTemplateNameChange = (event: ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => {
@@ -139,6 +164,17 @@ export const MailTemplateManager: React.FC<{
       </Grid>
       <Grid item xs={6}>
         <Typography variant={"h6"}>使用可能なデータ</Typography>
+        <Box display={"flex"} justifyContent={"flex-end"}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={editingTemplateData}
+                onChange={()=>setEditingTemplateData(!editingTemplateData)}
+              />
+            }
+            label={"チェックするとデータを編集できます。書き換えたデータは永続しません。"}
+          />
+        </Box>
         <Box m={3}>
           <Grid container spacing={2}>
             <Grid item xs={2}>
@@ -152,7 +188,7 @@ export const MailTemplateManager: React.FC<{
             </Grid>
             {mailTemplateDataKeys.map(key => (
               <>
-                <Grid item xs={2}>
+                <Grid item xs={2} style={{wordBreak: "break-all"}}>
                   {key}
                 </Grid>
                 <Grid item xs={3}>
@@ -160,9 +196,11 @@ export const MailTemplateManager: React.FC<{
                 </Grid>
                 <Grid item xs={7}>
                   <TextField
-                    disabled={true}
+                    disabled={!editingTemplateData}
                     fullWidth={true}
                     multiline={true}
+                    name={key}
+                    onChange={handleTemplateDataChange}
                     value={props.templateData[key]}
                     variant={"outlined"}
                   />

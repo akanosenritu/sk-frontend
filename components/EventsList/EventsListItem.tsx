@@ -2,7 +2,7 @@ import React from "react"
 import {Box, Grid, IconButton, makeStyles, Tooltip, Typography} from "@material-ui/core"
 import {Event} from "../../types/positions"
 import {collectEventStatistics, getDates} from "../../utils/event"
-import {formatDateToMDEEE, getIntervals, getIntervalString} from "../../utils/time"
+import {formatDateToJaMDEEE, getIntervals, getIntervalString} from "../../utils/time"
 import EditIcon from '@material-ui/icons/Edit'
 import OpenInNewIcon from '@material-ui/icons/OpenInNew'
 import {useRouter} from "next/router"
@@ -93,11 +93,13 @@ export const EventsListItem: React.FC<{
                 期間: {intervals.map(interval => getIntervalString(interval)).join(", ")} (計{dates.length}日間)
               </Box>
               <Box mt={1} mx={1}>
-                作成日: {formatDateToMDEEE(event.datetimeAdded)}
+                作成日: {formatDateToJaMDEEE(event.datetimeAdded)}
               </Box>
             </Box>
             <Box className={classes.bottomButtonContainer}>
-              <IconButton size={"small"}><Tooltip title={"概要編集画面を開く"}><EditIcon /></Tooltip></IconButton>
+              <IconButton onClick={()=>router.push(`/events/${event.uuid}/edit/`)} size={"small"}>
+                <Tooltip title={"概要編集画面を開く"}><EditIcon /></Tooltip>
+              </IconButton>
             </Box>
           </Box>
         </Grid>
@@ -126,7 +128,9 @@ export const EventsListItem: React.FC<{
               </Box>
             </Box>
             <Box className={classes.bottomButtonContainer}>
-              <IconButton size={"small"}><Tooltip title={"スタッフ割当画面を開く"}><EditIcon /></Tooltip></IconButton>
+              <IconButton onClick={()=>router.push(`/events/${event.uuid}/assign/`)} size={"small"}>
+                <Tooltip title={"スタッフ割当画面を開く"}><EditIcon /></Tooltip>
+              </IconButton>
             </Box>
           </Box>
         </Grid>
@@ -138,7 +142,9 @@ export const EventsListItem: React.FC<{
               工事中
             </Box>
             <Box className={classes.bottomButtonContainer}>
-              <IconButton size={"small"}><Tooltip title={"メール編集画面を開く"}><EditIcon /></Tooltip></IconButton>
+              <IconButton onClick={()=>router.push(`/events/${event.uuid}/mail/`)} size={"small"}>
+                <Tooltip title={"メール編集画面を開く"}><EditIcon /></Tooltip>
+              </IconButton>
             </Box>
           </Box>
         </Grid>

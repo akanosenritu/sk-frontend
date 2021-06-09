@@ -16,6 +16,7 @@ import {updatePositionStaffAssignments} from "../../../utils/api/position"
 import AssignableStaffRow from "./AssignableStaffRow"
 import {getAvailableStaffsForDates} from "../../../utils/api/staff"
 import {getDayStrings} from "../../../utils/event"
+import {Alert} from "@material-ui/lab"
 
 
 const useStyles = makeStyles({
@@ -23,7 +24,6 @@ const useStyles = makeStyles({
     borderCollapse: "collapse",
     tableLayout: "fixed",
     textAlign: "center",
-    minWidth: 600,
     "& thead": {
       borderBottom: "3px double lightgray"
     },
@@ -39,14 +39,16 @@ const useStyles = makeStyles({
   },
 })
 
+type Status = "initial" | "editing" | "saving" | "saved" | "saveFailed"
 
-
-const AssignmentTable: React.FC<{
+export const AssignmentTable: React.FC<{
   event: Event,
 }> = props => {
   const classes = useStyles()
 
   const {staffsDict} = useStaffs()
+
+  const [status, setStatus] = useState<Status>("initial")
 
   const dayStrings: string[] = useMemo<string[]>(() => getDayStrings(props.event), [props.event])
 
@@ -118,6 +120,7 @@ const AssignmentTable: React.FC<{
   }
 
   const assignStaffToPosition = (staffUUID: string, positionGroupUUID: string, dayString: string, index: number) => {
+    setStatus("editing")
     setStaffPositionAssignments(old => produce(old, draft => {
       const otherPositionGroupUUIDWithThisStaffUUID = getPositionGroupUUIDWithThisStaffUUID(staffUUID, dayString)
 
@@ -138,7 +141,9 @@ const AssignmentTable: React.FC<{
       }
     }))
   }
+
   const unassignStaff = (staffUUID: string, dayString: string) => {
+    setStatus("editing")
     setStaffPositionAssignments(old => produce(old, draft => {
       const positionGroupUUIDWithThisStaffUUID = getPositionGroupUUIDWithThisStaffUUID(staffUUID, dayString)
 
@@ -185,6 +190,7 @@ const AssignmentTable: React.FC<{
   }
 
   const onSave = async () => {
+    setStatus("saving")
     const staffPositionAssignmentsForPositionGroups = Object.values(staffPositionAssignments.assigned)
     for (const {positionGroup, assignedStaffUUIDsByDay} of staffPositionAssignmentsForPositionGroups) {
       for (const position of positionGroup.positions) {
@@ -193,12 +199,13 @@ const AssignmentTable: React.FC<{
           const result = await updatePositionStaffAssignments(position.uuid, assignedStaffUUIDsByDay[dayString])
           if (!result.ok) {
             console.log("error happened while updating a Position. ", position)
-          } else {
-            console.log("successfully updated position with new assignments of staffs.")
+            setStatus("saveFailed")
+            return
           }
         }
       }
     }
+    setStatus("saved")
   }
 
   /**
@@ -253,9 +260,20 @@ const AssignmentTable: React.FC<{
       </table>
     </DragDropContext>
     <Box mt={2}>
-      <Button fullWidth={true} variant={"contained"} onClick={onSave}>保存</Button>
+      {status === "saving" && <Alert severity={"info"}>保存中です</Alert>}
+      {status === "saved" && <Alert severity={"success"}>保存しました</Alert>}
+      {status === "saveFailed" && <Alert severity={"error"}>保存に失敗しました</Alert>}
+    </Box>
+    <Box mt={2}>
+      <Button
+        color={"primary"}
+        disabled={status !== "editing"}
+        fullWidth={true}
+        onClick={onSave}
+        variant={"contained"}
+      >
+        保存
+      </Button>
     </Box>
   </div>
 }
-
-export default AssignmentTable

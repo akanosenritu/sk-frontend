@@ -1,14 +1,12 @@
 import React from 'react';
 import {Event} from "../../types/positions"
 import {Box} from "@material-ui/core"
-import AssignmentTable from "./AssignmentTable/AssignmentTable"
+import {AssignmentTable} from "./AssignmentTable/AssignmentTable"
 
-const EventStaffAssignmentEditor: React.FC<{
+export const EventStaffAssignmentEditor: React.FC<{
   event: Event
 }> = (props) => {
-  return <Box style={{minWidth: 600}}>
+  return <Box>
     <AssignmentTable event={props.event} />
   </Box>
 }
-
-export default EventStaffAssignmentEditor

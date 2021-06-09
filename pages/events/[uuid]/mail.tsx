@@ -15,7 +15,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 const Page: React.FC<{
   uuid: string,
 }> = (props) => {
-  return <Layout>
+  return <Layout title={"確認メール"}>
     <AuthenticationRequiredContent>
       <Mail eventUUID={props.uuid} />
     </AuthenticationRequiredContent>

@@ -3,7 +3,7 @@ import {AssignmentsByDay} from "./event"
 import {Event, PositionGroup} from "../types/positions"
 import {Position} from "../types/position"
 import {format} from "date-fns"
-import {rawTimeToString} from "./time"
+import {formatDateTimeToJaMDEEEHm, rawTimeToString} from "./time"
 import {getValueWithDefault} from "./positions"
 import {ja} from "date-fns/locale"
 import {Setting} from "./setting"
@@ -12,6 +12,7 @@ import {getMailTemplates} from "./api/mailTemplate"
 
 export const mailTemplateDataKeys = [
   "clothes",
+  "confirmationDateLimit",
   "eventTitle",
   "footer",
   "gatheringPlaces",
@@ -20,8 +21,11 @@ export const mailTemplateDataKeys = [
   "recipient",
 ] as const
 
-export const mailTemplateDataKeyDescriptions:  {[key in typeof mailTemplateDataKeys[number]]: string} = {
+export type TemplateDataKey = typeof mailTemplateDataKeys[number]
+
+export const mailTemplateDataKeyDescriptions:  {[key in TemplateDataKey]: string} = {
   clothes: "服装の説明",
+  confirmationDateLimit: "確認期限",
   eventTitle: "イベント名",
   footer: "本文最下部に挿入されるフッター",
   gatheringPlaces: "集合場所の説明",
@@ -75,9 +79,10 @@ export const createDefaultSubject = (event: Event) => {
   return `[業務確定] ${event.title}`
 }
 
-export const getTemplateData = (staff: RegisteredStaff, assignmentsByDay: AssignmentsByDay, event: Event): MailTemplateData => {
+export const getTemplateData = (staff: RegisteredStaff, assignmentsByDay: AssignmentsByDay, event: Event, confirmationDateLimit: Date): MailTemplateData => {
   return {
     clothes: createSettingsDescription(gatherSettings("clothes", assignmentsByDay)),
+    confirmationDateLimit: formatDateTimeToJaMDEEEHm(confirmationDateLimit),
     eventTitle: event.title,
     footer: "株式会社S・K \nTEL：03-5312-7628\n平日：10時～18時",
     gatheringPlaces: createSettingsDescription(gatherSettings("gatheringPlace", assignmentsByDay)),

@@ -28,7 +28,7 @@ export const CollapsibleH5: React.FC<{
   return <>
     <Box display={"flex"} justifyContent={"space-between"} >
       <Box flexGrow={1} onClick={()=>setIsOpen(!isOpen)}>
-        <Typography variant={"h5"} style={{borderBottom: "1px solid black", paddingBottom: 3, marginBottom: 20}}>{props.title}</Typography>
+        <Typography variant={"h5"} style={{borderBottom: "1px solid black", paddingBottom: 3, marginBottom: 3}}>{props.title}</Typography>
       </Box>
       <Box>
         {isOpen?
