@@ -2,7 +2,6 @@ import React from 'react';
 import {Box, Button, makeStyles, Typography} from "@material-ui/core"
 import {useRouter} from "next/router"
 import EventsCalendar from "../../EventsTable/EventsCalendar"
-import PageWithDrawer from "../PageWithDrawer"
 import {CollapsibleH5, NewH5} from "../../Header"
 import {getEvents} from "../../../utils/api/event"
 import {useQuery} from "react-query"
@@ -30,12 +29,12 @@ const Index: React.FC = () => {
   const classes = useStyles()
   const router = useRouter()
 
-  const {error, data: events} = useQuery(["events", {}], () => getEvents({}))
+  const {data: events, error, isLoading} = useQuery(["events", {}], () => getEvents({}))
 
   if (error) return <ContentRetrievalFailedNotice description={"イベント情報の取得に失敗しました"} />
-  if (!events) return <ContentRetrievingNotice />
+  if (isLoading || events === undefined) return <ContentRetrievingNotice />
 
-  return <PageWithDrawer>
+  return <Box>
     <Box className={classes.titleBox} mt={2}>
       <Typography variant={"h4"}>イベント管理</Typography>
     </Box>
@@ -56,7 +55,7 @@ const Index: React.FC = () => {
             <Box m={2}>現在利用可能なイベントのリストが閲覧できます。</Box>
             <Box style={{display: "flex", justifyContent: "center"}} my={2}>
               <div>
-                <Button color={"primary"} variant={"contained"} onClick={()=>router.push("/events/new/")} disabled={true}>見る</Button>
+                <Button color={"primary"} variant={"contained"} onClick={()=>router.push("/events/list/")}>見る</Button>
               </div>
             </Box>
           </Box>
@@ -73,7 +72,7 @@ const Index: React.FC = () => {
         <EventsCalendar events={events} />
       </CollapsibleH5>
     </Box>
-  </PageWithDrawer>
+  </Box>
 }
 
 export default Index

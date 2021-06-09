@@ -70,7 +70,7 @@ const MyDrawer: React.FC<{}> = () => {
     router.push(destination)
   }
 
-  return <Box style={{width: 250}} mr={2}>
+  return <Box style={{width: 250}}>
     <Drawer
       anchor={"left"}
       open={true}

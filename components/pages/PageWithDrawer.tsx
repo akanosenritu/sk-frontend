@@ -1,14 +1,16 @@
 import React from 'react';
 import MyDrawer from "./MyDrawer"
-import {Box} from "@material-ui/core"
-import {makeStyles} from "@material-ui/core"
+import {Box, makeStyles} from "@material-ui/core"
 
 const useStyles = makeStyles({
   contentBox: {
+    backgroundColor: "#f2f2f2",
     display: "flex",
     flexGrow: 1,
+    height: "100vh",
     justifyContent: "center",
-    width: "80%",
+    paddingLeft: 50,
+    paddingRight: 50,
   },
   root: {
     display: "flex",
@@ -22,7 +24,7 @@ const PageWithDrawer: React.FC = (props) => {
   return <Box className={classes.root}>
     <MyDrawer />
     <Box className={classes.contentBox}>
-      <Box style={{flexGrow: 1}} m={6}>
+      <Box style={{flexGrow: 1}}>
         {props.children}
       </Box>
     </Box>

@@ -3,27 +3,49 @@ import {RegisteredStaff} from "../../../types/staffs"
 import {Box, Button, Grid, MenuItem, Select, TextField, Typography} from "@material-ui/core"
 import {FormikErrors, useFormik} from "formik"
 import {H5} from "../../Header"
-import {saveRegisteredStaffOnBackend} from "../../../utils/api/staff"
-import {useRouter} from "next/router"
+import {isThisStaffIdAvailable, saveRegisteredStaffOnBackend} from "../../../utils/api/staff"
 import {isValid} from "date-fns"
+import {isValidTelephoneNumber} from "../../../utils/misc"
+import * as yup from "yup"
+import {Alert} from "@material-ui/lab"
 
-type Status = "creating" | "saving" | "saved" | "editing" | "error"
+type Status = "initial" | "saving" | "saved" | "editing" | "error"
 
-const StaffEditor: React.FC<{
+export const StaffEditor: React.FC<{
   staff: RegisteredStaff
 }> = (props) => {
-  const router = useRouter()
   const formik = useFormik({
     initialValues: {
       ...props.staff,
       birthDateString: "",
     },
-    validate: values => {
-      // TODO: Write Validator!
+    validate: async (values) => {
       const errors: FormikErrors<RegisteredStaff & {birthDateString: string}> = {}
+
+      // staffId
+      if (values.staffId !== props.staff.staffId && !await isThisStaffIdAvailable(values.staffId)) errors.staffId = "このスタッフIDはすでに使われています。"
+      if (!values.staffId) errors.staffId = "スタッフIDが空です。"
+      // lastName
+      if (!values.lastName) errors.lastName = "名字が空です。"
+      // lastNameKana
+      if (!values.lastNameKana) errors.lastNameKana = "名字 (かな) が空です。"
+      // firstName
+      if (!values.firstName) errors.firstName = "名前が空です。"
+      // firstNameKana
+      if (!values.firstNameKana) errors.firstNameKana = "名前 (かな) が空です。"
+      // birthDateString
       if (!isValid(new Date(values.birthDateString))) errors.birthDateString = "不正な年月日です。"
+      // telephoneNumber
+      if (!isValidTelephoneNumber(values.telephoneNumber)) errors.telephoneNumber = "不正な電話番号形式です。"
+      if (!values.telephoneNumber) errors.telephoneNumber = "電話番号が空です。"
+      // emailAddress
+      if (!await yup.string().email().isValid(values.emailAddress)) errors.emailAddress = "不正なメールアドレスです。"
+      if (!values.emailAddress) errors.emailAddress = "メールアドレスが空です。"
+
       return errors
     },
+    validateOnBlur: false,
+    validateOnChange: false,
     onSubmit: async (values) => {
       setStatus("saving")
       const result = await saveRegisteredStaffOnBackend({
@@ -42,13 +64,17 @@ const StaffEditor: React.FC<{
     formik.handleChange(event)
   }
   
-  const [status, setStatus] = useState<Status>(props.staff.isSaved? "editing": "creating")
+  const [status, setStatus] = useState<Status>("initial")
   
   return <Box style={{minWidth: 600}}>
-    <Box>新しいスタッフを作成します。すべての項目を入力する必要があります。</Box>
     <Box>
       <Box mt={2}>
         <H5>ID</H5>
+        <Box m={1}>
+          <Typography variant={"body2"}>
+            UUIDはシステムによって自動的に割り当てられる識別子で編集できません。他のスタッフと同じスタッフIDを割り当てることはできません。
+          </Typography>
+        </Box>
         <TextField
           autoComplete={"off"}
           disabled={true}
@@ -79,6 +105,11 @@ const StaffEditor: React.FC<{
       </Box>
       <Box mt={2}>
         <H5>名前・性・生年月日</H5>
+        <Box m={1}>
+          <Typography variant={"body2"}>
+            ふりがなはひらがなで記入してください。
+          </Typography>
+        </Box>
         <Grid container={true} spacing={1}>
           <Grid item xs={6}>
             <TextField
@@ -205,9 +236,14 @@ const StaffEditor: React.FC<{
         </Box>
       </Box>
       <Box mt={2}>
+        <Box m={1}>
+          {status === "saved" && <Alert severity={"success"}>保存されました</Alert>}
+          {status === "saving" && <Alert severity={"info"}>保存中です</Alert>}
+          {status === "error" && <Alert severity={"error"}>保存に失敗しました</Alert>}
+        </Box>
         <Button 
           color={"primary"} 
-          disabled={status === "saving" || status === "saved"}
+          disabled={status !== "editing"}
           fullWidth={true} 
           onClick={formik.submitForm} 
           variant={"contained"}
@@ -216,21 +252,9 @@ const StaffEditor: React.FC<{
         </Button>
         <Typography>
           {status === "saved" && <div>
-            <span style={{color:"green"}}>保存されました。</span>
-            <Button
-              color={"primary"}
-              fullWidth={true}
-              onClick={()=>router.reload()}
-              variant={"contained"}
-            >
-              次のスタッフを作成する
-            </Button>
           </div>}
-          {status === "error" && <span style={{color:"red"}}>保存に失敗しました。</span>}
         </Typography>
       </Box>
     </Box>
   </Box>
 }
-
-export default StaffEditor

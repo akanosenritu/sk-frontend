@@ -4,35 +4,10 @@ import {Event} from "../../types/positions"
 import {collectEventStatistics, getDates} from "../../utils/event"
 import {formatDateToMDEEE, getIntervals, getIntervalString} from "../../utils/time"
 import EditIcon from '@material-ui/icons/Edit'
+import OpenInNewIcon from '@material-ui/icons/OpenInNew'
+import {useRouter} from "next/router"
 
 const useStyles = makeStyles({
-  root: {
-    height: 400,
-    padding: 10,
-  },
-  topContainer: {
-    backgroundColor: "lightgray",
-    border: "1px solid lightgray",
-    borderTopLeftRadius: 15,
-    borderTopRightRadius: 15,
-    display: "flex",
-    justifyContent: "space-between",
-    padding: 10,
-  },
-  mainContainer: {
-    border: "1px solid lightgray",
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
-    padding: 10,
-  },
-  detailContainer: {
-    borderRight: "1px solid lightgray",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    padding: 10,
-    height: 250,
-  },
   bottomButton: {
     fontSize: 12,
     padding: 3,
@@ -41,21 +16,54 @@ const useStyles = makeStyles({
     display: "flex",
     justifyContent: "flex-end",
   },
+  detailContainer: {
+    borderRight: "1px solid lightgray",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    padding: 10,
+    height: 330,
+  },
   mailContainer: {
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
-    height: 250,
+    height: 330,
     padding: 10,
+  },
+  mainContainer: {
+    // border: "1px solid lightgray",
+    borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
+    height: 350,
+    padding: 10,
+  },
+  root: {
+    backgroundColor: "white",
+    borderRadius: 15,
+    height: 400,
+    margin: 10,
   },
   staffContainer: {
     borderRight: "1px solid lightgray",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
-    height: 250,
+    height: 330,
     padding: 10,
-  }
+  },
+  topContainer: {
+    background: "linear-gradient(225deg, rgba(54, 102, 102, 0.9), rgba(220, 102, 102, 0.9))",
+    backgroundColor: "rgba(54, 0, 102, 0.9)",
+    color: "white",
+    border: "1px solid lightgray",
+    borderTopLeftRadius: 15,
+    borderTopRightRadius: 15,
+    display: "flex",
+    height: 50,
+    justifyContent: "space-between",
+    padding: 10,
+  },
 })
 
 export const EventsListItem: React.FC<{
@@ -67,9 +75,14 @@ export const EventsListItem: React.FC<{
   const intervals = getIntervals(dates)
   const stats = collectEventStatistics(event)
 
+  const router = useRouter()
+
   return <Box className={classes.root}>
     <Box className={classes.topContainer}>
       <Typography variant={"h5"}>{event.title}</Typography>
+      <Box>
+        <IconButton size={"small"} onClick={()=>router.push(`/events/${event.uuid}/`)}><OpenInNewIcon /></IconButton>
+      </Box>
     </Box>
     <Box className={classes.mainContainer}>
       <Grid container justify={"center"}>

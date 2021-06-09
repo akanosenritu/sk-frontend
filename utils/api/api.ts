@@ -49,7 +49,7 @@ export const get = async <T>(target: string): Promise<SuccessWithData<T>|Failure
   }
 }
 
-export const getWithParams = async <T>(target: string, params: {[key: string]: string | string[] | undefined}): Promise<SuccessWithData<T>|Failure> => {
+export const getWithParams = async <T>(target: string, params?: {[key: string]: string | string[] | undefined}): Promise<SuccessWithData<T>|Failure> => {
   let actualURL = new URL(apiURL + target, window.location.origin)
   if (params) {
     Object.entries(params).map(entry => {

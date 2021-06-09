@@ -1,6 +1,6 @@
 import {RegisteredStaff} from "../../types/staffs"
 import {format} from "date-fns"
-import {Failure, get, getWithParams, post, SuccessWithData} from "./api"
+import {Failure, getWithParams, post, SuccessWithData} from "./api"
 
 export type APIRegisteredStaff = {
   uuid: string,
@@ -64,8 +64,11 @@ export const saveRegisteredStaffOnBackend = async (registeredStaff: RegisteredSt
   return result
 }
 
-export const getStaffs = async (): Promise<RegisteredStaff[]> => {
-  const result = await get<APIRegisteredStaff[]>("registered-staffs/")
+type GetStaffsParams = {
+ staff_id?: string
+}
+export const getStaffs = async (params?: GetStaffsParams): Promise<RegisteredStaff[]> => {
+  const result = await getWithParams<APIRegisteredStaff[]>("registered-staffs/", params)
   if (result.ok) return result.data.map(staff => convertAPIRegisteredStaffToRegisteredStaff(staff))
   else throw new Error(result.description)
 }
@@ -85,4 +88,12 @@ export const getAvailableStaffsForDates = async (dateStrings: string[]): Promise
     }
   }
   return result
+}
+
+export const isThisStaffIdAvailable = async (staffId: string): Promise<boolean> => {
+  const result = await getWithParams<{is_available: boolean}>("registered-staffs/is_this_staff_id_available/", {staff_id: staffId})
+  if (result.ok) {
+    return result.data.is_available
+  }
+  return false
 }

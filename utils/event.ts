@@ -36,12 +36,13 @@ export const getDates = (event: Event) => {
     new Set(event.positionGroups
       .map(positionGroup => {
         return positionGroup.positions.map(
-          position => position.date
+          position => formatDateToYYYYMMDD(position.date)
         )
       })
       .flat()
     )
-  ).sort(compareAsc)
+  ).map(str => new Date(str))
+  .sort(compareAsc)
 }
 
 // returns a sorted array of dayStrings (formatted as YYYY-MM-DD) of dates
