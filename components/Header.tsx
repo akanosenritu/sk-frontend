@@ -1,7 +1,14 @@
-import {Box, IconButton, Typography} from "@material-ui/core"
+import {Box, IconButton, makeStyles, Typography} from "@material-ui/core"
 import React, {useState} from "react"
 import ExpandLessIcon from '@material-ui/icons/ExpandLess'
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore'
+
+const useStyles = makeStyles({
+  expandButton: {
+    backgroundColor: "white",
+    padding: 5,
+  },
+})
 
 export const H5: React.FC = props => {
   return <Typography variant={"h5"} style={{borderBottom: "1px solid black", paddingBottom: 3, marginBottom: 20}}>
@@ -25,6 +32,7 @@ export const CollapsibleH5: React.FC<{
   isOpen: boolean,
 }> = props => {
   const [isOpen, setIsOpen] = useState(props.isOpen)
+  const classes = useStyles()
   return <>
     <Box display={"flex"} justifyContent={"space-between"} >
       <Box flexGrow={1} onClick={()=>setIsOpen(!isOpen)}>
@@ -32,8 +40,8 @@ export const CollapsibleH5: React.FC<{
       </Box>
       <Box>
         {isOpen?
-          <IconButton onClick={()=>setIsOpen(false)}><ExpandLessIcon /></IconButton>:
-          <IconButton onClick={()=>setIsOpen(true)}><ExpandMoreIcon/></IconButton>
+          <IconButton className={classes.expandButton} onClick={()=>setIsOpen(false)}><ExpandLessIcon /></IconButton>:
+          <IconButton className={classes.expandButton} onClick={()=>setIsOpen(true)}><ExpandMoreIcon/></IconButton>
         }
       </Box>
     </Box>

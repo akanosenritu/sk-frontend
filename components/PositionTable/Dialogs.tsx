@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 import {Box, Button, Dialog, Typography} from "@material-ui/core"
-import PositionManagerEditor, {PositionManagerEditorProps} from "../PositionManager/PositionManagerEditor"
+import {PositionManagerEditor, PositionManagerEditorProps} from "../PositionManager/PositionManagerEditor"
 import {PositionDataNullable} from "../../types/positions"
 import {Position} from "../../types/position"
 import {format} from "date-fns"

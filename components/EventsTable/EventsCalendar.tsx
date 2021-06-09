@@ -4,8 +4,9 @@ import MyCalendar from "../MyCalendar"
 import {getIntervals} from "../../utils/time"
 import {useRouter} from "next/router"
 import {getDates} from "../../utils/event"
+import {Box} from "@material-ui/core"
 
-const EventsCalendar: React.FC<{
+export const EventsCalendar: React.FC<{
   events: Event[]
 }> = (props) => {
   const calendarEvents = useMemo<CalendarEvent<Event>[]>(() => {
@@ -33,11 +34,13 @@ const EventsCalendar: React.FC<{
     router.push(`/events/${event.uuid}/`)
   }
 
-  return <MyCalendar
-    events={calendarEvents}
-    onDoubleClickEvent={onDoubleClickEvent}
-    selectable={false}
-  />
+  return <Box m={1} p={1}>
+    <MyCalendar
+      events={calendarEvents}
+      onDoubleClickEvent={onDoubleClickEvent}
+      selectable={false}
+    />
+  </Box>
 }
 
 export default EventsCalendar

@@ -13,11 +13,6 @@ const useStyles = makeStyles({
     marginLeft: 30,
     flexGrow: 1,
   },
-  editorContainer: {
-    backgroundColor: "white",
-    borderRadius: 15,
-    padding: 10,
-  },
   titleContainer: {
     alignItems: "center",
     display: "flex",
@@ -35,7 +30,7 @@ const New = () => {
       <Typography variant={"h4"}>新しいスタッフを作成</Typography>
       <Box mt={2}>新しいスタッフを作成します。すべての項目を入力する必要があります。</Box>
     </Box>
-    <Box mt={2} className={classes.editorContainer}>
+    <Box mt={2}>
       <StaffEditor staff={newStaff} />
     </Box>
     <Box my={2} className={classes.bottomButtonsContainer}>

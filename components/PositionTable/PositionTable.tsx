@@ -26,11 +26,12 @@ const useStyles = makeStyles({
 })
 
 type Props = {
+  isEditable: boolean,
   positionGroups: PositionGroup[],
   onClickRow: (position: Position) => void
 }
 
-const PositionTable: React.FC<Props> = (props) => {
+export const PositionTable: React.FC<Props> = (props) => {
   const classes = useStyles()
   const rows = prepareRows(props.positionGroups.map(positionGroup => positionGroup.positions.map(subPosition => {
     return {
@@ -64,12 +65,10 @@ const PositionTable: React.FC<Props> = (props) => {
       <tr>
         <td colSpan={8}>
           <Typography variant={"caption"}>
-            各列はクリックすることで編集できます。グレーの背景のセルは標準の設定が使用されているセルです。
+            {props.isEditable && "各列はクリックすることで編集できます。グレーの背景のセルは標準の設定が使用されているセルです。"}
           </Typography>
         </td>
       </tr>
     </tfoot>
   </table>
 }
-
-export default PositionTable

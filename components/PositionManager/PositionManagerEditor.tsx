@@ -11,12 +11,13 @@ export type PositionManagerEditorProps = {
   clothesSettings: ClothesSetting[],
   defaultValues: PositionData,
   gatheringPlaceSettings: GatheringPlaceSetting[],
+  isEditable: boolean,
   isEditingDefaultData: boolean,
   initialValues: PositionDataNullable,
   onSave: (newValues: PositionDataNullable) => void,
 }
 
-const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
+export const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
   const initialValues: {
     [key in keyof PositionData]: ValueWithDefault<PositionData[key]>
   } = Object.fromEntries(
@@ -134,21 +135,21 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
       </Box>
       <Box flexGrow={1}>
         <TextField
-          variant={"outlined"}
-          title={"開始時間"}
-          value={formik.values.startHourString}
-          size={"small"}
+          disabled={!props.isEditable || isFieldInheritingDefault["startHour"]}
+          error={!!formik.errors.startHourString}
+          fullWidth={true}
+          label={formik.errors.startHourString}
           name={"startHourString"}
-          disabled={isFieldInheritingDefault["startHour"]}
           onBlur={onBlurStartHour}
           onChange={onChange}
-          error={!!formik.errors.startHourString}
-          label={formik.errors.startHourString}
-          fullWidth
+          size={"small"}
+          title={"開始時間"}
+          value={formik.values.startHourString}
+          variant={"outlined"}
         />
       </Box>
       <Checkbox
-        disabled={props.isEditingDefaultData}
+        disabled={!props.isEditable || props.isEditingDefaultData}
         checked={props.isEditingDefaultData || isFieldInheritingDefault["startHour"]}
         color={"default"}
         onClick={() => onClickDefaultCheckbox("startHour")}
@@ -165,7 +166,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
           value={formik.values.endHourString}
           size={"small"}
           name={"endHourString"}
-          disabled={isFieldInheritingDefault["endHour"]}
+          disabled={!props.isEditable || isFieldInheritingDefault["endHour"]}
           onBlur={onBlurEndHour}
           onChange={onChange}
           error={!!formik.errors.endHourString}
@@ -174,7 +175,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
         />
       </Box>
       <Checkbox
-        disabled={props.isEditingDefaultData}
+        disabled={!props.isEditable || props.isEditingDefaultData}
         checked={props.isEditingDefaultData || isFieldInheritingDefault["endHour"]}
         color={"default"}
         onClick={() => onClickDefaultCheckbox("endHour")}
@@ -190,7 +191,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
           fullWidth={true}
           label={formik.errors.male}
           name={"male"}
-          disabled={!props.isEditingDefaultData && isFieldInheritingDefault["male"]}
+          disabled={!props.isEditable || !props.isEditingDefaultData && isFieldInheritingDefault["male"]}
           onBlur={onBlur}
           onChange={onChange}
           size={"small"}
@@ -201,7 +202,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
         />
       </Box>
       <Checkbox
-        disabled={props.isEditingDefaultData}
+        disabled={!props.isEditable || props.isEditingDefaultData}
         checked={props.isEditingDefaultData || isFieldInheritingDefault["male"]}
         color={"default"}
         onClick={() => onClickDefaultCheckbox("male")}
@@ -217,7 +218,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
           fullWidth={true}
           label={formik.errors.female}
           name={"female"}
-          disabled={isFieldInheritingDefault["female"]}
+          disabled={!props.isEditable || isFieldInheritingDefault["female"]}
           onBlur={onBlur}
           onChange={onChange}
           size={"small"}
@@ -228,7 +229,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
         />
       </Box>
       <Checkbox
-        disabled={props.isEditingDefaultData}
+        disabled={!props.isEditable || props.isEditingDefaultData}
         checked={props.isEditingDefaultData || isFieldInheritingDefault["female"]}
         color={"default"}
         onClick={() => onClickDefaultCheckbox("female")}
@@ -244,7 +245,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
           fullWidth={true}
           label={formik.errors.unspecified}
           name={"unspecified"}
-          disabled={isFieldInheritingDefault["unspecified"]}
+          disabled={!props.isEditable || isFieldInheritingDefault["unspecified"]}
           onBlur={onBlur}
           onChange={onChange}
           size={"small"}
@@ -255,7 +256,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
         />
       </Box>
       <Checkbox
-        disabled={props.isEditingDefaultData}
+        disabled={!props.isEditable || props.isEditingDefaultData}
         checked={props.isEditingDefaultData || isFieldInheritingDefault["unspecified"]}
         color={"default"}
         onClick={() => onClickDefaultCheckbox("unspecified")}
@@ -273,7 +274,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
           fullWidth
           style={{height: 40}}
           name={"clothesUUID"}
-          disabled={isFieldInheritingDefault["clothes"]}
+          disabled={!props.isEditable || isFieldInheritingDefault["clothes"]}
           onBlur={onBlur}
           onChange={onChange}
         >
@@ -283,7 +284,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
         </Select>
       </Box>
       <Checkbox
-        disabled={props.isEditingDefaultData}
+        disabled={!props.isEditable || props.isEditingDefaultData}
         checked={props.isEditingDefaultData || isFieldInheritingDefault["clothes"]}
         color={"default"}
         onClick={() => onClickDefaultCheckbox("clothes")}
@@ -301,7 +302,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
           fullWidth
           style={{height: 40}}
           name={"gatheringPlaceUUID"}
-          disabled={isFieldInheritingDefault["gatheringPlace"]}
+          disabled={!props.isEditable || isFieldInheritingDefault["gatheringPlace"]}
           onBlur={onBlur}
           onChange={onChange}
         >
@@ -311,7 +312,7 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
         </Select>
       </Box>
       <Checkbox
-        disabled={props.isEditingDefaultData}
+        disabled={!props.isEditable || props.isEditingDefaultData}
         checked={props.isEditingDefaultData || isFieldInheritingDefault["gatheringPlace"]}
         color={"default"}
         onClick={() => onClickDefaultCheckbox("gatheringPlace")}
@@ -319,5 +320,3 @@ const PositionManagerEditor: React.FC<PositionManagerEditorProps> = (props) => {
     </Box>
   </Box>
 }
-
-export default PositionManagerEditor

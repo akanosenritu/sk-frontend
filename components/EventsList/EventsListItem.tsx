@@ -38,6 +38,9 @@ const useStyles = makeStyles({
     height: 350,
     padding: 10,
   },
+  openEventDetailButton: {
+    color: "white",
+  },
   root: {
     backgroundColor: "white",
     borderRadius: 15,
@@ -81,7 +84,13 @@ export const EventsListItem: React.FC<{
     <Box className={classes.topContainer}>
       <Typography variant={"h5"}>{event.title}</Typography>
       <Box>
-        <IconButton size={"small"} onClick={()=>router.push(`/events/${event.uuid}/`)}><OpenInNewIcon /></IconButton>
+        <IconButton
+          className={classes.openEventDetailButton}
+          onClick={()=>router.push(`/events/${event.uuid}/`)}
+          size={"small"}
+        >
+          <OpenInNewIcon />
+        </IconButton>
       </Box>
     </Box>
     <Box className={classes.mainContainer}>

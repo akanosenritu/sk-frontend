@@ -11,9 +11,9 @@ import {BackButton} from "../../../BackButton"
 
 const useStyles = makeStyles({
   contentBox: {
-    backgroundColor: "white",
-    borderRadius: 15,
-    padding: 10,
+    // backgroundColor: "white",
+    // borderRadius: 15,
+    // padding: 10,
   },
   titleBox: {
     alignItems: "center",

@@ -1,23 +1,25 @@
-import React from "react"
+import React, {useState} from "react"
 import {Position} from "../../../types/position"
 import {PositionGroup} from "../../../types/positions"
 import {formatDateToYYYYMMDD} from "../../../utils/time"
 import PositionCell from "./PositionCell"
 import EmptyCell from "./EmptyCell"
 import {RegisteredStaff} from "../../../types/staffs"
+import {PositionManagerDialog} from "../../PositionManager/PositionManagerDialog"
 
-const PositionGroupRow: React.FC<{
+export const PositionGroupRow: React.FC<{
   positionGroup: PositionGroup,
   columnDays: string[],
   staffUUIDsByDay: {[dayString: string]: string[]}
   staffsDict: {[staffUUID: string]: RegisteredStaff}
 }> = props => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const daysWithPosition: {[date: string]: Position|null} = Object.fromEntries(props.columnDays.map(day => [day, null]))
   for (const position of props.positionGroup.positions) {
     daysWithPosition[formatDateToYYYYMMDD(position.date)] = position
   }
   return <tr>
-    <td>{props.positionGroup.title}</td>
+    <td onClick={()=>setIsDialogOpen(true)}>{props.positionGroup.title}</td>
     {props.columnDays.map(day => {
       const position = daysWithPosition[day]
       if (position != null) {
@@ -32,6 +34,12 @@ const PositionGroupRow: React.FC<{
         return <EmptyCell key={`positionGroup===${props.positionGroup.uuid}===${day}`}/>
       }
     })}
+    {isDialogOpen && <PositionManagerDialog
+      clothesSettings={[]}
+      gatheringPlaceSettings={[]}
+      onClose={()=>setIsDialogOpen(false)}
+      positionGroup={props.positionGroup}
+    />}
   </tr>
 }
 

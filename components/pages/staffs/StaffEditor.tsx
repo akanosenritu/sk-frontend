@@ -8,6 +8,8 @@ import {isValid} from "date-fns"
 import {isValidTelephoneNumber} from "../../../utils/misc"
 import * as yup from "yup"
 import {Alert} from "@material-ui/lab"
+import {ContentBox} from "../../ContentBox"
+import {BasicCaption} from "../../BasicCaption"
 
 type Status = "initial" | "saving" | "saved" | "editing" | "error"
 
@@ -70,169 +72,179 @@ export const StaffEditor: React.FC<{
     <Box>
       <Box mt={2}>
         <H5>ID</H5>
-        <Box m={1}>
-          <Typography variant={"body2"}>
-            UUIDはシステムによって自動的に割り当てられる識別子で編集できません。他のスタッフと同じスタッフIDを割り当てることはできません。
-          </Typography>
-        </Box>
-        <TextField
-          autoComplete={"off"}
-          disabled={true}
-          error={!!formik.errors.uuid}
-          fullWidth={true}
-          helperText={formik.errors.uuid}
-          InputLabelProps={{shrink: true}}
-          label={"UUID*"}
-          name={"uuid"}
-          onChange={handleChange}
-          style={{marginTop: 20}}
-          value={formik.values.uuid}
-          variant={"outlined"}
-        />
-        <TextField
-          autoComplete={"off"}
-          error={!!formik.errors.staffId}
-          fullWidth={true}
-          helperText={formik.errors.staffId}
-          InputLabelProps={{shrink: true}}
-          label={"スタッフID*"}
-          name={"staffId"}
-          onChange={handleChange}
-          style={{marginTop: 20}}
-          value={formik.values.staffId}
-          variant={"outlined"}
-        />
+        <ContentBox>
+          <Box mt={1}>
+            <BasicCaption>
+              UUIDはシステムによって自動的に割り当てられる識別子で編集できません。他のスタッフと同じスタッフIDを割り当てることはできません。
+            </BasicCaption>
+          </Box>
+          <Box mt={2}>
+            <TextField
+              autoComplete={"off"}
+              disabled={true}
+              error={!!formik.errors.uuid}
+              fullWidth={true}
+              helperText={formik.errors.uuid}
+              InputLabelProps={{shrink: true}}
+              label={"UUID*"}
+              name={"uuid"}
+              onChange={handleChange}
+              style={{marginTop: 20}}
+              value={formik.values.uuid}
+              variant={"outlined"}
+            />
+            <TextField
+              autoComplete={"off"}
+              error={!!formik.errors.staffId}
+              fullWidth={true}
+              helperText={formik.errors.staffId}
+              InputLabelProps={{shrink: true}}
+              label={"スタッフID*"}
+              name={"staffId"}
+              onChange={handleChange}
+              style={{marginTop: 20}}
+              value={formik.values.staffId}
+              variant={"outlined"}
+            />
+          </Box>
+        </ContentBox>
       </Box>
       <Box mt={2}>
         <H5>名前・性・生年月日</H5>
-        <Box m={1}>
-          <Typography variant={"body2"}>
-            ふりがなはひらがなで記入してください。
-          </Typography>
-        </Box>
-        <Grid container={true} spacing={1}>
-          <Grid item xs={6}>
-            <TextField
-              autoComplete={"off"}
-              error={!!formik.errors.lastName}
-              fullWidth={true}
-              helperText={formik.errors.lastName}
-              InputLabelProps={{shrink: true}}
-              label={"名字*"}
-              name={"lastName"}
-              onChange={handleChange}
-              style={{marginTop: 20}}
-              value={formik.values.lastName}
-              variant={"outlined"}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              autoComplete={"off"}
-              error={!!formik.errors.lastNameKana}
-              fullWidth={true}
-              helperText={formik.errors.lastNameKana}
-              InputLabelProps={{shrink: true}}
-              label={"名字 (かな)*"}
-              name={"lastNameKana"}
-              onChange={handleChange}
-              style={{marginTop: 20}}
-              value={formik.values.lastNameKana}
-              variant={"outlined"}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              autoComplete={"off"}
-              error={!!formik.errors.firstName}
-              fullWidth={true}
-              helperText={formik.errors.firstName}
-              InputLabelProps={{shrink: true}}
-              label={"名前*"}
-              name={"firstName"}
-              onChange={handleChange}
-              style={{marginTop: 20}}
-              value={formik.values.firstName}
-              variant={"outlined"}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              autoComplete={"off"}
-              error={!!formik.errors.firstNameKana}
-              fullWidth={true}
-              helperText={formik.errors.firstNameKana}
-              InputLabelProps={{shrink: true}}
-              label={"名前 (かな)*"}
-              name={"firstNameKana"}
-              onChange={handleChange}
-              style={{marginTop: 20}}
-              value={formik.values.firstNameKana}
-              variant={"outlined"}
-            />
-          </Grid>
-          <Grid item xs={9}>
-            <TextField
-              error={!!formik.errors.birthDateString}
-              fullWidth={true}
-              helperText={formik.errors.birthDateString}
-              InputLabelProps={{
-                shrink: true
-              }}
-              label={"生年月日*"}
-              name={"birthDateString"}
-              onChange={formik.handleChange}
-              style={{marginTop: 20}}
-              type={"date"}
-              value={formik.values.birthDateString}
-              variant={"outlined"}
-            />
-          </Grid>
-          <Grid item xs={3}>
-            <Select
-              error={!!formik.errors.gender}
-              fullWidth={true}
-              label={"性*"}
-              name={"gender"}
-              onChange={formik.handleChange}
-              style={{marginTop: 20}}
-              value={formik.values.gender}
-              variant={"outlined"}
-            >
-              <MenuItem value={"male"}>男</MenuItem>
-              <MenuItem value={"female"}>女</MenuItem>
-              <MenuItem value={"unspecified"}>未指定</MenuItem>
-            </Select>
-          </Grid>
-        </Grid>
+        <ContentBox>
+          <Box mt={1}>
+            <BasicCaption>ふりがなはひらがなで記入してください。</BasicCaption>
+          </Box>
+          <Box mt={1}>
+            <Grid container={true} spacing={1}>
+              <Grid item xs={6}>
+                <TextField
+                  autoComplete={"off"}
+                  error={!!formik.errors.lastName}
+                  fullWidth={true}
+                  helperText={formik.errors.lastName}
+                  InputLabelProps={{shrink: true}}
+                  label={"名字*"}
+                  name={"lastName"}
+                  onChange={handleChange}
+                  style={{marginTop: 20}}
+                  value={formik.values.lastName}
+                  variant={"outlined"}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  autoComplete={"off"}
+                  error={!!formik.errors.lastNameKana}
+                  fullWidth={true}
+                  helperText={formik.errors.lastNameKana}
+                  InputLabelProps={{shrink: true}}
+                  label={"名字 (かな)*"}
+                  name={"lastNameKana"}
+                  onChange={handleChange}
+                  style={{marginTop: 20}}
+                  value={formik.values.lastNameKana}
+                  variant={"outlined"}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  autoComplete={"off"}
+                  error={!!formik.errors.firstName}
+                  fullWidth={true}
+                  helperText={formik.errors.firstName}
+                  InputLabelProps={{shrink: true}}
+                  label={"名前*"}
+                  name={"firstName"}
+                  onChange={handleChange}
+                  style={{marginTop: 20}}
+                  value={formik.values.firstName}
+                  variant={"outlined"}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  autoComplete={"off"}
+                  error={!!formik.errors.firstNameKana}
+                  fullWidth={true}
+                  helperText={formik.errors.firstNameKana}
+                  InputLabelProps={{shrink: true}}
+                  label={"名前 (かな)*"}
+                  name={"firstNameKana"}
+                  onChange={handleChange}
+                  style={{marginTop: 20}}
+                  value={formik.values.firstNameKana}
+                  variant={"outlined"}
+                />
+              </Grid>
+              <Grid item xs={9}>
+                <TextField
+                  error={!!formik.errors.birthDateString}
+                  fullWidth={true}
+                  helperText={formik.errors.birthDateString}
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  label={"生年月日*"}
+                  name={"birthDateString"}
+                  onChange={formik.handleChange}
+                  style={{marginTop: 20}}
+                  type={"date"}
+                  value={formik.values.birthDateString}
+                  variant={"outlined"}
+                />
+              </Grid>
+              <Grid item xs={3}>
+                <Select
+                  error={!!formik.errors.gender}
+                  fullWidth={true}
+                  label={"性*"}
+                  name={"gender"}
+                  onChange={formik.handleChange}
+                  style={{marginTop: 20}}
+                  value={formik.values.gender}
+                  variant={"outlined"}
+                >
+                  <MenuItem value={"male"}>男</MenuItem>
+                  <MenuItem value={"female"}>女</MenuItem>
+                  <MenuItem value={"unspecified"}>未指定</MenuItem>
+                </Select>
+              </Grid>
+            </Grid>
+          </Box>
+        </ContentBox>
         <Box mt={2}>
           <H5>連絡先</H5>
-          <TextField
-            autoComplete={"off"}
-            error={!!formik.errors.telephoneNumber}
-            fullWidth={true}
-            helperText={formik.errors.telephoneNumber}
-            InputLabelProps={{shrink: true}}
-            label={"電話番号*"}
-            name={"telephoneNumber"}
-            onChange={handleChange}
-            style={{marginTop: 20}}
-            value={formik.values.telephoneNumber}
-            variant={"outlined"}
-          />
-          <TextField
-            autoComplete={"off"}
-            error={!!formik.errors.emailAddress}
-            fullWidth={true}
-            helperText={formik.errors.emailAddress}
-            InputLabelProps={{shrink: true}}
-            label={"メールアドレス*"}
-            name={"emailAddress"}
-            onChange={handleChange}
-            style={{marginTop: 20}}
-            value={formik.values.emailAddress}
-            variant={"outlined"}
-          />
+          <ContentBox>
+            <Box mt={1}>
+              <TextField
+                autoComplete={"off"}
+                error={!!formik.errors.telephoneNumber}
+                fullWidth={true}
+                helperText={formik.errors.telephoneNumber}
+                InputLabelProps={{shrink: true}}
+                label={"電話番号*"}
+                name={"telephoneNumber"}
+                onChange={handleChange}
+                style={{marginTop: 20}}
+                value={formik.values.telephoneNumber}
+                variant={"outlined"}
+              />
+              <TextField
+                autoComplete={"off"}
+                error={!!formik.errors.emailAddress}
+                fullWidth={true}
+                helperText={formik.errors.emailAddress}
+                InputLabelProps={{shrink: true}}
+                label={"メールアドレス*"}
+                name={"emailAddress"}
+                onChange={handleChange}
+                style={{marginTop: 20}}
+                value={formik.values.emailAddress}
+                variant={"outlined"}
+              />
+            </Box>
+          </ContentBox>
         </Box>
       </Box>
       <Box mt={2}>

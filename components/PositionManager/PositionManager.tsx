@@ -1,8 +1,8 @@
 import React, {useState} from "react"
-import PositionTable from "../PositionTable/PositionTable"
+import {PositionTable} from "../PositionTable/PositionTable"
 import {Box, IconButton, InputBase, Typography} from "@material-ui/core"
 import {Setting} from "../../utils/setting"
-import PositionManagerEditor from "./PositionManagerEditor"
+import {PositionManagerEditor} from "./PositionManagerEditor"
 import {PositionDataNullable, PositionGroup} from "../../types/positions"
 import {Position} from "../../types/position"
 import {v4} from "uuid"
@@ -12,11 +12,12 @@ import {getIndexOfMatchingPositionData, getPositionDataOrDefaultData} from "../.
 import produce from "immer"
 
 const PositionManager: React.FC<{
-  positionGroup: PositionGroup,
   clothesSettings: Setting[],
+  isEditable: boolean,
   gatheringPlaceSettings: Setting[],
-  onSave: (updatedPositionGroup: PositionGroup) => void,
   onDelete: (deletedPositionGroup: PositionGroup) => void,
+  onSave: (updatedPositionGroup: PositionGroup) => void,
+  positionGroup: PositionGroup,
 }> = (props) => {
   const onSaveDefaultData = (newData: PositionDataNullable) => {
     props.onSave({
@@ -31,7 +32,11 @@ const PositionManager: React.FC<{
   const positionGroups = [props.positionGroup]
 
   const [editingPosition, setEditingPosition] = useState<Position|null>(null)
-  const onClickRowOnPositionTable = (position: Position) => setEditingPosition(position)
+  const onClickRowOnPositionTable = (position: Position) => {
+    if (props.isEditable) {
+      setEditingPosition(position)
+    }
+  }
   const onSaveSubPositionData = (position: Position) => {
     // @ts-ignore
     const index = getIndexOfMatchingPositionData(props.positionGroup.positions, position)
@@ -70,11 +75,13 @@ const PositionManager: React.FC<{
           defaultValues={props.positionGroup.defaultPositionData}
           gatheringPlaceSettings={props.gatheringPlaceSettings}
           initialValues={props.positionGroup.defaultPositionData}
+          isEditable={props.isEditable}
           isEditingDefaultData={true}
           onSave={onSaveDefaultData}
         />
       </Box>
       <PositionTable
+        isEditable={props.isEditable}
         key={v4()}
         onClickRow={onClickRowOnPositionTable}
         positionGroups={positionGroups}
@@ -85,6 +92,7 @@ const PositionManager: React.FC<{
       defaultValues={props.positionGroup.defaultPositionData}
       gatheringPlaceSettings={props.gatheringPlaceSettings}
       initialValues={editingPosition.data}
+      isEditable={props.isEditable}
       isEditingDefaultData={false}
       onCloseWithoutSave={()=>setEditingPosition(null)}
       onSave={onSaveSubPositionData}

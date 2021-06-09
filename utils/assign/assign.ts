@@ -34,6 +34,23 @@ export const detectNumberOfPeopleDiscrepancies = (
     return result
   }
 
+  let remainingUnspecified = required.unspecified
+  while (remainingUnspecified > 0) {
+    if (maleOverFlow > 0) {
+      maleOverFlow -= 1
+      remainingUnspecified -= 1
+    } else {
+      break
+    }
+  }
+  while (remainingUnspecified > 0) {
+    if (femaleOverFlow > 0) {
+      femaleOverFlow -= 1
+      remainingUnspecified -= 1
+    } else {
+      break
+    }
+  }
   if (maleOverFlow) result.male = -1 * maleOverFlow
   if (femaleOverFlow) result.female = -1 * femaleOverFlow
   result.unspecified =

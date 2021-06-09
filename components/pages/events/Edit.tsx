@@ -1,11 +1,13 @@
 import React from 'react'
-import EventEditor from "./EventEditor"
+import {EventEditor} from "./EventEditor"
 import {getEventByUUID} from "../../../utils/api/event"
 import {ContentRetrievalFailedNotice, ContentRetrievingNotice} from "../RetrievalRequiredContent"
-import {BackButton} from "../../BackButton"
+import {BottomNavigationWithBackButton} from "../../BackButton"
 import {useRouter} from "next/router"
-import {Box} from "@material-ui/core"
+import {Box, Button} from "@material-ui/core"
 import {useQuery} from "react-query"
+import {BasicPageTitle} from "../../BasicPageTitle"
+
 
 const Edit: React.FC<{
   eventUUID: string
@@ -15,12 +17,21 @@ const Edit: React.FC<{
   if (error) return <ContentRetrievalFailedNotice description={"イベントの取得に失敗しました。"} />
   if (!event) return <ContentRetrievingNotice />
   return <div>
-    <Box my={2}>
-      <BackButton onClick={()=>router.push(`/events/${props.eventUUID}/`)} />
+    <BasicPageTitle descriptions={"イベントの設定を編集できます。"} title={"イベントを編集"} />
+    <Box mt={2}>
+      <EventEditor event={event} />
     </Box>
-    <EventEditor event={event} />
     <Box my={2}>
-      <BackButton onClick={()=>router.push(`/events/${props.eventUUID}/`)} />
+      <BottomNavigationWithBackButton onClickBack={()=>router.push(`/events/${props.eventUUID}/`)}>
+        <Button
+          color={"primary"}
+          fullWidth={true}
+          onClick={()=>router.push(`/events/${props.eventUUID}/assign/`)}
+          variant={"contained"}
+        >
+          スタッフの割当に進む
+        </Button>
+      </BottomNavigationWithBackButton>
     </Box>
   </div>
 };

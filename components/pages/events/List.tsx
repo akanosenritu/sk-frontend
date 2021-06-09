@@ -1,9 +1,10 @@
 import React from "react"
-import {Box, makeStyles, Typography} from "@material-ui/core"
+import {Box, makeStyles} from "@material-ui/core"
 import {useQuery} from "react-query"
 import {getEvents} from "../../../utils/api/event"
 import {ContentRetrievalFailedNotice, ContentRetrievingNotice} from "../RetrievalRequiredContent"
 import {EventsListItem} from "../../EventsList/EventsListItem"
+import {BasicPageTitle} from "../../BasicPageTitle"
 
 const useStyles = makeStyles({
   root: {
@@ -23,9 +24,7 @@ export const List: React.FC<{}> = () => {
   if (isLoading || events === undefined) return <ContentRetrievingNotice />
 
   return <Box className={classes.root}>
-    <Box className={classes.titleBox} m={3}>
-      <Typography variant={"h3"}>イベントリスト</Typography>
-    </Box>
+    <BasicPageTitle descriptions={""} title={"イベントリスト"} />
     <Box mt={2}>
       {events.map(event => <EventsListItem event={event} />)}
     </Box>

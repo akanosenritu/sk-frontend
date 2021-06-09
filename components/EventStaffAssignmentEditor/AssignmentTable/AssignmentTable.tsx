@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useState} from "react"
 import {Event, PositionGroup} from "../../../types/positions"
 import {Box, Button, makeStyles} from "@material-ui/core"
 import DayHeader from "./DayHeader"
-import PositionGroupRow from "./PositionGroupRow"
+import {PositionGroupRow} from "./PositionGroupRow"
 import {formatDateToYYYYMMDD} from "../../../utils/time"
 import {
   StaffPositionAssignments,

@@ -1,6 +1,7 @@
 import React from "react"
-import {Box, makeStyles, Typography} from "@material-ui/core"
+import {Box, makeStyles} from "@material-ui/core"
 import {BackButton} from "./BackButton"
+import {BasicPageTitle} from "./BasicPageTitle"
 
 const useStyles = makeStyles({
   contentBox: {
@@ -23,12 +24,7 @@ export const BasicPage: React.FC<{
 }> = props => {
   const classes = useStyles()
   return <div>
-    <Box className={classes.titleBox} mt={2}>
-      <Typography variant={"h4"}>{props.title}</Typography>
-      <Box mt={2}>
-        {props.descriptions}
-      </Box>
-    </Box>
+    <BasicPageTitle descriptions={props.descriptions} title={props.title} />
     <Box className={classes.contentBox} mt={2}>
       {props.children}
     </Box>
