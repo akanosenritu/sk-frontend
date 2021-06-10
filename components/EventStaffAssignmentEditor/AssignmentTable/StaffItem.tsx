@@ -25,7 +25,7 @@ const useStyles = makeStyles({
   }
 })
 
-const StaffItem: React.FC<{
+export const StaffItem: React.FC<{
   index: number,
   staff: RegisteredStaff,
   dayString: string
@@ -49,5 +49,3 @@ const StaffItem: React.FC<{
     )}
   </Draggable>
 }
-
-export default StaffItem

@@ -3,7 +3,7 @@ import {Event, PositionGroup} from "../../../types/positions"
 import {Box, Button, makeStyles} from "@material-ui/core"
 import DayHeader from "./DayHeader"
 import {PositionGroupRow} from "./PositionGroupRow"
-import {formatDateToYYYYMMDD} from "../../../utils/time"
+import {formatDateToJaMDEEE, formatDateToYYYYMMDD} from "../../../utils/time"
 import {
   StaffPositionAssignments,
   StaffPositionAssignmentsForPositionGroup,
@@ -15,9 +15,11 @@ import {useStaffs} from "../../../utils/staff"
 import {updatePositionStaffAssignments} from "../../../utils/api/position"
 import AssignableStaffRow from "./AssignableStaffRow"
 import {getAvailableStaffsForDates} from "../../../utils/api/staff"
-import {getDayStrings} from "../../../utils/event"
+import {createPositionDict, getDayStrings} from "../../../utils/event"
 import {Alert} from "@material-ui/lab"
-
+import isEqual from "lodash/isEqual"
+import {Position} from "../../../types/position"
+import useInterval from "use-interval"
 
 const useStyles = makeStyles({
   table: {
@@ -39,7 +41,11 @@ const useStyles = makeStyles({
   },
 })
 
-type Status = "initial" | "editing" | "saving" | "saved" | "saveFailed"
+type StatusNames = "initial" | "editing" | "saving" | "saved" | "saveFailed" | "autoSaving" | "autoSaved" | "autoSaveFailed"
+type Status = {
+  status: StatusNames,
+  message: string,
+}
 
 export const AssignmentTable: React.FC<{
   event: Event,
@@ -48,9 +54,11 @@ export const AssignmentTable: React.FC<{
 
   const {staffsDict} = useStaffs()
 
-  const [status, setStatus] = useState<Status>("initial")
+  const [status, setStatus] = useState<Status>({status: "initial", message: ""})
 
+  // data gathered for convenience
   const dayStrings: string[] = useMemo<string[]>(() => getDayStrings(props.event), [props.event])
+  const positionDict = useMemo<Map<string, Position>>(() => createPositionDict(props.event), [props.event])
 
   const createInitialStaffPositionAssignments = (): StaffPositionAssignments => {
     const createStaffPositionAssignmentsForPositionGroup = (positionGroup: PositionGroup): StaffPositionAssignmentsForPositionGroup => {
@@ -120,7 +128,7 @@ export const AssignmentTable: React.FC<{
   }
 
   const assignStaffToPosition = (staffUUID: string, positionGroupUUID: string, dayString: string, index: number) => {
-    setStatus("editing")
+    setStatus({status: "editing", message: ""})
     setStaffPositionAssignments(old => produce(old, draft => {
       const otherPositionGroupUUIDWithThisStaffUUID = getPositionGroupUUIDWithThisStaffUUID(staffUUID, dayString)
 
@@ -143,7 +151,7 @@ export const AssignmentTable: React.FC<{
   }
 
   const unassignStaff = (staffUUID: string, dayString: string) => {
-    setStatus("editing")
+    setStatus({status: "editing", message: ""})
     setStaffPositionAssignments(old => produce(old, draft => {
       const positionGroupUUIDWithThisStaffUUID = getPositionGroupUUIDWithThisStaffUUID(staffUUID, dayString)
 
@@ -189,40 +197,59 @@ export const AssignmentTable: React.FC<{
     }
   }
 
-  const onSave = async () => {
-    setStatus("saving")
+  const save = async (staffPositionAssignments: StaffPositionAssignments): Promise<Success|Failure> => {
     const staffPositionAssignmentsForPositionGroups = Object.values(staffPositionAssignments.assigned)
     for (const {positionGroup, assignedStaffUUIDsByDay} of staffPositionAssignmentsForPositionGroups) {
       for (const position of positionGroup.positions) {
         const dayString = formatDateToYYYYMMDD(position.date)
         if (assignedStaffUUIDsByDay[dayString] != null) {
-          const result = await updatePositionStaffAssignments(position.uuid, assignedStaffUUIDsByDay[dayString])
-          if (!result.ok) {
-            console.log("error happened while updating a Position. ", position)
-            setStatus("saveFailed")
-            return
+          const oldPosition = positionDict.get(position.uuid)
+          if (!oldPosition) return {
+            ok: false,
+            description: `UUID: ${position.uuid}を持つPositionがこのEventに存在しないため、保存できません。`
+          }
+          const oldAssignedStaffUUIDs = oldPosition.assignedStaffs.map(staff => staff.uuid)
+          const newAssignedStaffUUIDs = assignedStaffUUIDsByDay[dayString]
+
+          // compare two sets of uuids and only if they are different, update the position.
+          if (!isEqual(new Set(oldAssignedStaffUUIDs), new Set(newAssignedStaffUUIDs))) {
+            const result = await updatePositionStaffAssignments(position.uuid, assignedStaffUUIDsByDay[dayString])
+            if (!result.ok) {
+              return {
+                ok: false,
+                description: `${positionGroup.title} (${formatDateToJaMDEEE(position.date)}) の保存に失敗しました。`
+              }
+            }
           }
         }
       }
     }
-    setStatus("saved")
+    return {
+      ok: true
+    }
   }
 
-  /**
-  const assignedStaffUUIDsByDay = useMemo<{[dayString: string]: string[]}>(() => {
-    const assignedStaffUUIDsByDayByPositionGroups = Object.values(staffPositionAssignments).map(o => o.assignedStaffUUIDsByDay)
-    const result: {[dayString: string]: string[]} = {}
-    for (const dayString of dayStrings) {
-      result[dayString] = []
-      for (const assignedStaffUUIDsByDayByPositionGroup of assignedStaffUUIDsByDayByPositionGroups) {
-        if (assignedStaffUUIDsByDayByPositionGroup[dayString]) {
-          result[dayString] = result[dayString].concat(assignedStaffUUIDsByDayByPositionGroup[dayString])
-        }
-      }
+  const onClickSave = async () => {
+    setStatus({status: "saving", message: "手動保存中。"})
+    const result = await save(staffPositionAssignments)
+    if (result.ok) setStatus({status: "saving", message: "手動保存に成功しました。"})
+    else {
+      setStatus({status: "saveFailed", message: result.description})
     }
-    return result
-  }, [staffPositionAssignments, dayStrings])
-  **/
+  }
+
+  useInterval(() => {
+    setStatus({status: "autoSaving", message: "自動保存中。"})
+    save(staffPositionAssignments)
+      .then(result => {
+        if (result.ok) {
+          setStatus({status: "autoSaved", message: "自動保存されました。"})
+        }
+        else {
+          setStatus({status: "autoSaveFailed", message: result.description})
+        }
+      })
+  }, 10000)
 
   return <div>
     <DragDropContext
@@ -253,23 +280,28 @@ export const AssignmentTable: React.FC<{
             />
           })}
           <AssignableStaffRow
-            availableStaffsByDay={staffPositionAssignments.unassigned.assignedStaffUUIDsByDay}
+            availableStaffUUIDsByDay={staffPositionAssignments.unassigned.assignedStaffUUIDsByDay}
             columnDays={dayStrings}
+            staffsDict={staffsDict}
           />
         </tbody>
       </table>
     </DragDropContext>
     <Box mt={2}>
-      {status === "saving" && <Alert severity={"info"}>保存中です</Alert>}
-      {status === "saved" && <Alert severity={"success"}>保存しました</Alert>}
-      {status === "saveFailed" && <Alert severity={"error"}>保存に失敗しました</Alert>}
+      {status.status === "editing" && <Alert severity={"info"}>保存されていない編集があります</Alert>}
+      {status.status === "saving" && <Alert severity={"info"}>保存中です</Alert>}
+      {status.status === "autoSaving" && <Alert severity={"info"}>自動保存中です</Alert>}
+      {status.status === "saved" && <Alert severity={"success"}>保存しました</Alert>}
+      {status.status === "autoSaved" && <Alert severity={"success"}>自動保存されています。</Alert>}
+      {status.status === "saveFailed" && <Alert severity={"error"}>保存に失敗しました。理由：{status.message}</Alert>}
+      {status.status === "autoSaveFailed" && <Alert severity={"error"}>自動保存に失敗しました。理由: {status.message}</Alert>}
     </Box>
     <Box mt={2}>
       <Button
         color={"primary"}
-        disabled={status !== "editing"}
+        disabled={status.status !== "editing"}
         fullWidth={true}
-        onClick={onSave}
+        onClick={onClickSave}
         variant={"contained"}
       >
         保存

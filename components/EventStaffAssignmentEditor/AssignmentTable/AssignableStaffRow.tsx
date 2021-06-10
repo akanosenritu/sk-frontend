@@ -1,10 +1,11 @@
 import React from 'react'
 import AssignableStaffCell from "./AssignableStaffCell"
-import {StaffUUIDsByDay} from "../../../types/staffs"
+import {StaffsDict, StaffUUIDsByDay} from "../../../types/staffs"
 
 const AssignableStaffRow: React.FC<{
-  availableStaffsByDay: StaffUUIDsByDay,
+  availableStaffUUIDsByDay: StaffUUIDsByDay,
   columnDays: string[],
+  staffsDict: StaffsDict,
 }> = (props) => {
   return <tr>
     <td>配置可能な<br/>スタッフ</td>
@@ -12,7 +13,7 @@ const AssignableStaffRow: React.FC<{
       return <AssignableStaffCell
         id={`staffCell===${day}`}
         key={`staffCell===${day}`}
-        availableStaffUUIDs={props.availableStaffsByDay[day]}
+        availableStaffs={props.availableStaffUUIDsByDay[day].map(uuid => props.staffsDict[uuid]).filter(staff => staff)}
         dayString={day}
       />
     })}

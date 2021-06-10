@@ -1,18 +1,13 @@
 import React from 'react';
-import StaffItem from "./StaffItem"
+import {StaffItem} from "./StaffItem"
 import {Droppable} from "react-beautiful-dnd"
-import {useStaffs} from "../../../utils/staff"
+import {RegisteredStaff} from "../../../types/staffs"
 
 const AssignableStaffCell: React.FC<{
-  availableStaffUUIDs: string[],
+  availableStaffs: RegisteredStaff[],
   dayString: string,
   id: string
 }> = (props) => {
-  const {staffsDict} = useStaffs()
-  const staffs = props.availableStaffUUIDs
-      .map(uuid => staffsDict[uuid])
-      .filter(staff => staff)
-
   return <Droppable droppableId={props.id}>
     {provided => (
       <td
@@ -20,7 +15,7 @@ const AssignableStaffCell: React.FC<{
         {...provided.droppableProps}
       >
         <div>
-          {staffs.map((staff, index) => {
+          {props.availableStaffs.map((staff, index) => {
             return <StaffItem
               dayString={props.dayString}
               key={`staffItem===${staff.uuid}===${props.dayString}`}

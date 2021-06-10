@@ -1,5 +1,5 @@
 import React from "react"
-import StaffItem from "./StaffItem"
+import {StaffItem} from "./StaffItem"
 import {Position} from "../../../types/position"
 import {PositionGroup} from "../../../types/positions"
 import {detectNumberOfPeopleDiscrepancies} from "../../../utils/assign/assign"
@@ -15,6 +15,10 @@ import {getJapaneseTranslationForGender} from "../../../utils/gender"
 const useStyles = makeStyles({
   root: {
     borderCollapse: "separate"
+  },
+  discrepanciesInfoContainer: {
+    cursor: "pointer",
+    marginTop: 30
   },
 })
 
@@ -69,7 +73,10 @@ const PositionCell: React.FC<{
           </div>
         )}
       </Droppable>
-      <div style={{height: 30 * Object.values(discrepancies).filter(d => d !== 0).length, marginTop: 30}}>
+      <div
+        className={classes.discrepanciesInfoContainer}
+        style={{height: 30 * Object.values(discrepancies).filter(d => d !== 0).length}}
+      >
         <DisplayDiscrepancyInfoForGender gender={"male"} discrepancies={discrepancies} />
         <DisplayDiscrepancyInfoForGender gender={"female"} discrepancies={discrepancies} />
         <DisplayDiscrepancyInfoForGender gender={"unspecified"} discrepancies={discrepancies} />

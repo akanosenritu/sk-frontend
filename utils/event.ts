@@ -131,3 +131,13 @@ export const collectEventStatistics = (event: Event): EventStatistics => {
     totalNumberOfStaffsAssignedByGender: assigned,
   }
 }
+
+export const createPositionDict = (event: Event): Map<string, Position> => {
+  const dict: Map<string, Position> = new Map()
+  for (const positionGroup of event.positionGroups) {
+    for (const position of positionGroup.positions) {
+      dict.set(position.uuid, position)
+    }
+  }
+  return dict
+}
