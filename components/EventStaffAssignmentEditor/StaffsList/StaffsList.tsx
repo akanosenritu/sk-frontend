@@ -1,7 +1,7 @@
 import React from 'react';
 import {Box, makeStyles, Typography} from "@material-ui/core"
 import {RegisteredStaff} from "../../../types/staffs"
-import StaffItem from "../AssignmentTable/StaffItem"
+import {StaffItem} from "../AssignmentTable/StaffItem"
 import {Droppable} from "react-beautiful-dnd"
 
 const useStyles = makeStyles({
